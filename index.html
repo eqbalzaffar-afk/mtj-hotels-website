@@ -39,18 +39,23 @@
             heroSubtitle: "Experience unparalleled luxury and hospitality in Taj Nagri, Agra, Uttar Pradesh.",
             restaurantTitle: "MTJ LONDON DARBAR",
             restaurantDescription: "Discover a curated fusion of world cuisine at MTJ London Darbar, where local flavors meet international flair in a magnificent setting.",
-            addressLine1: "Taj Nagri, Taj East Gate Rd, Taj Nagari Phase 1, Shilpgram Road. ,
-            addressLine2: "Agra, Uttar Pradesh 282001, India",
-            contactPhone: "+918607686409",
+            addressLine1: "MIG 1 & 2, Shilpgram Road, Taj Nagri, Phase 1,",
+            addressLine2: "Taj East Gate, MIG Colony, Agra, Uttar Pradesh 282006",
+            contactPhone: "+91 86076 86409",
             contactEmail: "reservations@mtjhotels.com",
 
-            // Media URL Defaults (Placeholders)
-            logoUrl: 'https://placehold.co/150x40/111827/D97706?text=MTJ+HOTELS',
-            heroBackgroundUrl: 'https://placehold.co/1400x700/111827/e5e7eb?text=ELEGANT+HOTEL+EXTERIOR',
-            restaurantImage: 'https://placehold.co/700x500/374151/ffffff?text=MTJ+LONDON+DARBAR+DINING',
-            roomImage0: 'https://placehold.co/600x400/1e293b/ffffff?text=Family+Quad+Room',
-            roomImage1: 'https://placehold.co/600x400/293a4c/ffffff?text=Family+Triple+Room',
-            roomImage2: 'https://placehold.co/600x400/4f46e5/ffffff?text=Deluxe+Twin+Room',
+            // Media URL Defaults (Themed Placeholders)
+            logoUrl: 'https://placehold.co/150x40/1f2937/d97706?text=MTJ+HOTELS',
+            heroBackgroundUrl: 'https://placehold.co/1400x700/1f2937/e5e7eb?text=MTJ+Hotels+Agra+Facade',
+            restaurantImage: 'https://placehold.co/700x500/1f2937/d97706?text=MTJ+London+Darbar+Interior',
+            
+            // Room Images (6 Types)
+            roomImage0: 'https://placehold.co/600x400/1f2937/d97706?text=Family+Quad+Room',
+            roomImage1: 'https://placehold.co/600x400/293a4c/d97706?text=Family+Triple+Room',
+            roomImage2: 'https://placehold.co/600x400/4f46e5/d97706?text=Deluxe+Twin+Beds',
+            roomImage3: 'https://placehold.co/600x400/374151/d97706?text=Standard+Room',
+            roomImage4: 'https://placehold.co/600x400/546e7a/d97706?text=Deluxe+Room+Luxury',
+            roomImage5: 'https://placehold.co/600x400/8d6e63/d97706?text=Female+Dormitory',
         };
         
         // --- Utility Functions ---
@@ -163,29 +168,33 @@
                 const roomCards = document.querySelectorAll('#rooms-container > div[data-room-index]');
                 data.rooms = Array.isArray(data.rooms) ? data.rooms : [];
 
-                // Use room name defaults if no DB data exists
-                const defaultRoomNames = ["Family Deluxe Quad Room", "Family Deluxe Triple Room", "Deluxe Twin Room"];
-                const defaultRoomDescs = [
-                    "Our most spacious family suite, comfortably accommodating up to four adults with premium bedding and a dedicated lounge area.",
-                    "A well-designed room ideal for family or friend groups of three, ensuring a comfortable and relaxing stay.",
-                    "A spacious option featuring two separate single beds, perfect for shared trips without compromising comfort."
+                // Default room configuration for all 6 types
+                const defaultRoomConfigs = [
+                    { name: "Family Deluxe Quad Room", desc: "Spacious room accommodating four adults, perfect for family travel.", price: "Inquire for Price" },
+                    { name: "Family Deluxe Triple Room", desc: "Comfortable and roomy lodging for three adults, ideal for friend groups.", price: "Inquire for Price" },
+                    { name: "Deluxe Twin Room", desc: "Two large separate beds in a finely appointed room for shared trips.", price: "Inquire for Price" },
+                    { name: "Standard Room (4 Units)", desc: "The perfect balance of comfort and value for short or long stays.", price: "Inquire for Price" },
+                    { name: "Deluxe Room (4 Units)", desc: "Elevated comfort with premium amenities and enhanced views.", price: "Inquire for Price" },
+                    { name: "Female Dormitory (18 Beds)", desc: "Secure and dedicated bunk bed accommodation for female solo travelers or groups.", price: "Inquire for Price" },
                 ];
                 
                 roomCards.forEach((card, index) => {
+                    const defaultRoom = defaultRoomConfigs[index];
                     const roomData = data.rooms[index];
+
                     const roomNameEl = card.querySelector('[data-field="roomName"]');
                     const roomDescEl = card.querySelector('[data-field="roomDescription"]');
                     const roomPriceEl = card.querySelector('[data-field="roomPrice"]');
                     const roomImgEl = card.querySelector('img');
 
                     if (roomData) {
-                        roomNameEl.textContent = roomData.name || defaultRoomNames[index];
-                        roomDescEl.textContent = roomData.description || defaultRoomDescs[index];
-                        roomPriceEl.textContent = roomData.price || "Inquire for Price";
+                        roomNameEl.textContent = roomData.name || defaultRoom.name;
+                        roomDescEl.textContent = roomData.description || defaultRoom.desc;
+                        roomPriceEl.textContent = roomData.price || defaultRoom.price;
                     } else {
-                        roomNameEl.textContent = defaultRoomNames[index];
-                        roomDescEl.textContent = defaultRoomDescs[index];
-                        roomPriceEl.textContent = "Inquire for Price";
+                        roomNameEl.textContent = defaultRoom.name;
+                        roomDescEl.textContent = defaultRoom.desc;
+                        roomPriceEl.textContent = defaultRoom.price;
                     }
                     
                     // Update room image
@@ -389,7 +398,7 @@
         <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <!-- Logo Area (Editable Media) -->
             <div class="flex items-center space-x-4">
-                <img id="hotel-logo" src="https://placehold.co/150x40/111827/D97706?text=MTJ+HOTELS" alt="MTJ Hotels Logo" class="h-10 w-auto">
+                <img id="hotel-logo" src="https://placehold.co/150x40/1f2937/d97706?text=MTJ+HOTELS" alt="MTJ Hotels Logo" class="h-10 w-auto">
                 
                 <!-- Logo Upload UI -->
                 <div class="admin-media-upload hidden flex items-center space-x-2">
@@ -438,7 +447,7 @@
 
 
         <!-- Hero Section (Editable Background) -->
-        <section id="hero-section" class="relative h-[650px] md:h-[800px] flex items-center justify-center text-white" style="background-image: url('https://placehold.co/1400x700/111827/e5e7eb?text=ELEGANT+HOTEL+EXTERIOR'); background-size: cover; background-position: center;">
+        <section id="hero-section" class="relative h-[650px] md:h-[800px] flex items-center justify-center text-white" style="background-image: url('https://placehold.co/1400x700/1f2937/e5e7eb?text=MTJ+Hotels+Agra+Facade'); background-size: cover; background-position: center;">
             <div class="absolute inset-0 bg-primary-dark opacity-60"></div>
             <div class="relative z-10 text-center max-w-5xl px-4">
                 <p class="text-lg font-medium color-accent mb-4 uppercase tracking-widest">MTJ HOTELS</p>
@@ -468,17 +477,15 @@
         <section id="rooms" class="py-24 sm:py-32 bg-white">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <p class="text-lg text-center color-accent mb-2 uppercase tracking-widest">Accommodations</p>
-                <h2 class="text-4xl font-light color-primary-dark text-center mb-4 uppercase tracking-wider">
+                <h2 class="text-4xl font-light color-primary-dark text-center mb-16 uppercase tracking-wider">
                     Luxury Rooms & Dormitory
                 </h2>
-                <p class="text-center text-gray-500 text-lg mb-16 max-w-3xl mx-auto">
-                    We proudly offer fooding and Lodging for every travel need.
-                </p>
                 
-                <div id="rooms-container" class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                <div id="rooms-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
+                    
                     <!-- Room Card 1 (Family Deluxe Quad) -->
                     <div data-room-index="0" class="bg-white rounded-xl shadow-3xl overflow-hidden border-t-8 border-color-accent transition duration-500 hover:shadow-4xl hover:-translate-y-1">
-                        <img id="room-img-0" src="https://placehold.co/600x400/1e293b/ffffff?text=Family+Quad+Room" alt="Family Deluxe Quad Room" class="w-full h-56 object-cover">
+                        <img id="room-img-0" src="https://placehold.co/600x400/1f2937/d97706?text=MTJ+Family+Quad+Room" alt="Family Deluxe Quad Room" class="w-full h-56 object-cover">
                         <!-- Room 1 Image Upload UI -->
                         <div class="admin-media-upload hidden p-4 flex justify-center">
                             <button onclick="document.getElementById('file-input-room0').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
@@ -499,7 +506,7 @@
 
                     <!-- Room Card 2 (Family Deluxe Triple) -->
                     <div data-room-index="1" class="bg-white rounded-xl shadow-3xl overflow-hidden border-t-8 border-color-accent transition duration-500 hover:shadow-4xl hover:-translate-y-1">
-                        <img id="room-img-1" src="https://placehold.co/600x400/293a4c/ffffff?text=Family+Triple+Room" alt="Family Deluxe Triple Room" class="w-full h-56 object-cover">
+                        <img id="room-img-1" src="https://placehold.co/600x400/293a4c/d97706?text=MTJ+Family+Triple+Room" alt="Family Deluxe Triple Room" class="w-full h-56 object-cover">
                         <!-- Room 2 Image Upload UI -->
                         <div class="admin-media-upload hidden p-4 flex justify-center">
                             <button onclick="document.getElementById('file-input-room1').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
@@ -520,7 +527,7 @@
                     
                     <!-- Room Card 3 (Deluxe Twin) -->
                     <div data-room-index="2" class="bg-white rounded-xl shadow-3xl overflow-hidden border-t-8 border-color-accent transition duration-500 hover:shadow-4xl hover:-translate-y-1">
-                        <img id="room-img-2" src="https://placehold.co/600x400/4f46e5/ffffff?text=Deluxe+Twin+Room" alt="Deluxe Twin Room" class="w-full h-56 object-cover">
+                        <img id="room-img-2" src="https://placehold.co/600x400/4f46e5/d97706?text=MTJ+Deluxe+Twin+Beds" alt="Deluxe Twin Room" class="w-full h-56 object-cover">
                         <!-- Room 3 Image Upload UI -->
                         <div class="admin-media-upload hidden p-4 flex justify-center">
                             <button onclick="document.getElementById('file-input-room2').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
@@ -538,6 +545,70 @@
                             </div>
                         </div>
                     </div>
+
+                    <!-- Room Card 4 (Standard Room) -->
+                    <div data-room-index="3" class="bg-white rounded-xl shadow-3xl overflow-hidden border-t-8 border-color-accent transition duration-500 hover:shadow-4xl hover:-translate-y-1">
+                        <img id="room-img-3" src="https://placehold.co/600x400/374151/d97706?text=Standard+Room" alt="Standard Room" class="w-full h-56 object-cover">
+                        <!-- Room 4 Image Upload UI -->
+                        <div class="admin-media-upload hidden p-4 flex justify-center">
+                            <button onclick="document.getElementById('file-input-room3').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
+                                Upload Room Photo
+                            </button>
+                            <input type="file" id="file-input-room3" accept="image/*" onchange="uploadFileAndSaveURL(this, 'roomImage3', 'room-img-3', 'room3-loading')" class="hidden">
+                            <span id="room3-loading" class="ml-2 text-xs color-accent hidden"></span>
+                        </div>
+                        <div class="p-8">
+                            <h3 data-field="roomName" class="text-2xl font-light color-primary-dark mb-3 uppercase">Standard Room (4 Units)</h3>
+                            <p data-field="roomDescription" class="text-gray-600 mb-5">Our comfortable and efficient rooms offering the best value for solo and couple travelers.</p>
+                            <div class="flex justify-between items-center mt-4 border-t pt-4">
+                                <span data-field="roomPrice" class="text-2xl font-bold color-accent">Inquire for Price</span>
+                                <a href="#" class="text-sm font-medium color-primary-dark hover:color-accent transition duration-300">VIEW DETAILS &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Room Card 5 (Deluxe Room) -->
+                    <div data-room-index="4" class="bg-white rounded-xl shadow-3xl overflow-hidden border-t-8 border-color-accent transition duration-500 hover:shadow-4xl hover:-translate-y-1">
+                        <img id="room-img-4" src="https://placehold.co/600x400/546e7a/d97706?text=Deluxe+Room+Luxury" alt="Deluxe Room" class="w-full h-56 object-cover">
+                        <!-- Room 5 Image Upload UI -->
+                        <div class="admin-media-upload hidden p-4 flex justify-center">
+                            <button onclick="document.getElementById('file-input-room4').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
+                                Upload Room Photo
+                            </button>
+                            <input type="file" id="file-input-room4" accept="image/*" onchange="uploadFileAndSaveURL(this, 'roomImage4', 'room-img-4', 'room4-loading')" class="hidden">
+                            <span id="room4-loading" class="ml-2 text-xs color-accent hidden"></span>
+                        </div>
+                        <div class="p-8">
+                            <h3 data-field="roomName" class="text-2xl font-light color-primary-dark mb-3 uppercase">Deluxe Room (4 Units)</h3>
+                            <p data-field="roomDescription" class="text-gray-600 mb-5">Enjoy enhanced space, premium linen, and dedicated workspace for a superior stay.</p>
+                            <div class="flex justify-between items-center mt-4 border-t pt-4">
+                                <span data-field="roomPrice" class="text-2xl font-bold color-accent">Inquire for Price</span>
+                                <a href="#" class="text-sm font-medium color-primary-dark hover:color-accent transition duration-300">VIEW DETAILS &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Room Card 6 (Female Dormitory) -->
+                    <div data-room-index="5" class="bg-white rounded-xl shadow-3xl overflow-hidden border-t-8 border-color-accent transition duration-500 hover:shadow-4xl hover:-translate-y-1">
+                        <img id="room-img-5" src="https://placehold.co/600x400/8d6e63/d97706?text=Female+Dormitory" alt="Female Dormitory" class="w-full h-56 object-cover">
+                        <!-- Room 6 Image Upload UI -->
+                        <div class="admin-media-upload hidden p-4 flex justify-center">
+                            <button onclick="document.getElementById('file-input-room5').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
+                                Upload Room Photo
+                            </button>
+                            <input type="file" id="file-input-room5" accept="image/*" onchange="uploadFileAndSaveURL(this, 'roomImage5', 'room-img-5', 'room5-loading')" class="hidden">
+                            <span id="room5-loading" class="ml-2 text-xs color-accent hidden"></span>
+                        </div>
+                        <div class="p-8">
+                            <h3 data-field="roomName" class="text-2xl font-light color-primary-dark mb-3 uppercase">Female Dormitory (18 Beds)</h3>
+                            <p data-field="roomDescription" class="text-gray-600 mb-5">Safe and secure bunk bed accommodation dedicated exclusively to female travelers, with individual lockers.</p>
+                            <div class="flex justify-between items-center mt-4 border-t pt-4">
+                                <span data-field="roomPrice" class="text-2xl font-bold color-accent">Inquire for Price</span>
+                                <a href="#" class="text-sm font-medium color-primary-dark hover:color-accent transition duration-300">VIEW DETAILS &rarr;</a>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
@@ -549,7 +620,7 @@
                     
                     <!-- Image Placeholder (Editable Media) -->
                     <div class="md:w-1/2 rounded-xl shadow-2xl overflow-hidden mb-10 md:mb-0">
-                        <img id="restaurant-image-el" src="https://placehold.co/700x500/374151/ffffff?text=MTJ+LONDON+DARBAR+DINING" alt="Elegant restaurant interior" class="w-full h-full object-cover">
+                        <img id="restaurant-image-el" src="https://placehold.co/700x500/1f2937/d97706?text=MTJ+London+Darbar+Interior" alt="Elegant restaurant interior" class="w-full h-full object-cover">
                         <!-- Restaurant Image Upload UI -->
                         <div class="admin-media-upload hidden p-4 flex justify-center -mt-4">
                             <button onclick="document.getElementById('file-input-restaurant').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
@@ -608,8 +679,8 @@
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold color-primary-dark mb-3">Location</h3>
-                        <p id="address-line1" data-field="addressLine1" class="text-gray-600 mb-1">Taj Nagri, Phase-2, Fatehabad Road</p>
-                        <p id="address-line2" data-field="addressLine2" class="text-gray-600">Agra, Uttar Pradesh 282001, India</p>
+                        <p id="address-line1" data-field="addressLine1" class="text-gray-600 mb-1">MIG 1 & 2, Shilpgram Road, Taj Nagri, Phase 1,</p>
+                        <p id="address-line2" data-field="addressLine2" class="text-gray-600">Taj East Gate, MIG Colony, Agra, Uttar Pradesh 282006</p>
                     </div>
 
                     <!-- Phone -->
@@ -620,7 +691,7 @@
                             </svg>
                         </div>
                         <h3 class="text-xl font-semibold color-primary-dark mb-3">Call Us</h3>
-                        <p id="contact-phone" data-field="contactPhone" class="text-gray-600 font-bold">+91 78912 34567</p>
+                        <p id="contact-phone" data-field="contactPhone" class="text-gray-600 font-bold">+91 86076 86409</p>
                         <p class="text-sm text-gray-500 mt-2">Available 24/7</p>
                     </div>
 
@@ -645,9 +716,6 @@
                 <p class="text-lg font-light color-accent mb-2">MTJ Hotels</p>
                 <p class="text-sm text-gray-400">&copy; <span id="current-year">2024</span> MTJ Hotels. All rights reserved.</p>
             </div>
-            <script>
-                document.getElementById('current-year').textContent = new Date().getFullYear();
-            </script>
         </footer>
     </main>
 </body>
