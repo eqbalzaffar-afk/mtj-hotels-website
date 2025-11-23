@@ -15,19 +15,24 @@
             min-height: 100vh;
         }
         .hero-bg {
-            background-image: url('https://placehold.co/1200x600/1e293b/ffffff?text=MTJ+Hotels+Agra+%7C+Rooftop+View+Placeholder');
+            /* Fallback/Placeholder Image - Dynamically set by JS */
+            background-image: url('https://placehold.co/1200x600/1e293b/ffffff?text=Luxury+Hotel+Interior+Placeholder');
             background-size: cover;
             background-position: center;
+            background-repeat: no-repeat;
         }
+        /* Primary button style: Amber/Gold gradient for professional look */
         .btn-primary {
             background: linear-gradient(135deg, #f59e0b, #eab308);
             transition: all 0.3s ease;
+            border: none;
         }
         .btn-primary:hover {
             background: linear-gradient(135deg, #eab308, #fbbf24);
-            box-shadow: 0 4px 15px rgba(234, 179, 8, 0.4);
+            box-shadow: 0 4px 15px rgba(234, 179, 8, 0.6);
             transform: translateY(-2px);
         }
+        /* Feature list styling with gold checkmark */
         .feature-list li {
             position: relative;
             padding-left: 1.5rem;
@@ -37,7 +42,7 @@
             content: '✓'; 
             position: absolute;
             left: 0;
-            color: #f59e0b;
+            color: #f59e0b; /* Amber/Gold Checkmark */
             font-weight: bold;
         }
         .admin-link {
@@ -45,6 +50,18 @@
             color: #f59e0b;
             text-decoration: underline;
             margin-left: 1rem;
+        }
+        .text-logo-span {
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        /* Styles for social media icons */
+        .social-icon {
+            fill: #9ca3af; /* Default gray fill */
+            transition: fill 0.2s ease;
+        }
+        .social-icon:hover {
+            fill: #f59e0b; /* Amber/Gold on hover */
         }
     </style>
 </head>
@@ -66,17 +83,20 @@
             <!-- Header & Navigation -->
             <header class="bg-white shadow-lg sticky top-0 z-50">
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center h-20">
-                    <div class="text-2xl font-extrabold text-amber-600">
-                        <span id="site-hotel-name-header">MTJ</span> <span class="text-gray-900">HOTELS</span>
+                    <div class="flex items-center text-amber-600">
+                        <!-- Logo Display -->
+                        <img id="site-logo-header" src="" alt="MTJ Logo" class="h-10 mr-2 rounded-md hidden" onerror="this.onerror=null; this.src='https://placehold.co/40x40/f59e0b/ffffff?text=MTJ'">
+                        <span id="site-hotel-name-header" class="text-logo-span">MTJ</span> <span class="text-gray-900 text-logo-span">HOTELS</span>
                     </div>
                     <nav class="hidden md:flex space-x-8 items-center">
-                        <a href="#about" class="text-gray-600 hover:text-amber-600 transition duration-150">About</a>
-                        <a href="#rooms" class="text-gray-600 hover:text-amber-600 transition duration-150">Rooms & Dorms</a>
-                        <a href="#amenities" class="text-gray-600 hover:text-amber-600 transition duration-150">Amenities</a>
-                        <a href="#location" class="text-gray-600 hover:text-amber-600 transition duration-150">Location</a>
-                        <span id="admin-login-link" class="admin-link text-sm">Admin Login</span>
+                        <a href="#about" class="text-gray-600 hover:text-amber-600 transition duration-150 font-medium">About</a>
+                        <a href="#rooms" class="text-gray-600 hover:text-amber-600 transition duration-150 font-medium">Rooms & Dorms</a>
+                        <a href="#amenities" class="text-gray-600 hover:text-amber-600 transition duration-150 font-medium">Amenities</a>
+                        <a href="#location" class="text-gray-600 hover:text-amber-600 transition duration-150 font-medium">Location</a>
+                        <!-- Admin link is hidden until auth is ready -->
+                        <span id="admin-login-link" class="admin-link text-sm hidden font-medium">Admin Login</span>
                     </nav>
-                    <a href="#booking-form" class="btn-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md hidden md:block">
+                    <a id="booking-link-header" href="#" class="btn-primary text-white font-semibold py-2 px-4 rounded-lg shadow-md hidden md:block">
                         BOOK NOW
                     </a>
                     <!-- Mobile Menu Button -->
@@ -92,23 +112,24 @@
                 <a href="#rooms" class="block py-2 text-gray-700 hover:bg-amber-50/50 rounded-md transition duration-150">Rooms & Dorms</a>
                 <a href="#amenities" class="block py-2 text-gray-700 hover:bg-amber-50/50 rounded-md transition duration-150">Amenities</a>
                 <a href="#location" class="block py-2 text-gray-700 hover:bg-amber-50/50 rounded-md transition duration-150">Location</a>
-                <a href="#booking-form" class="block py-2 text-center btn-primary text-white font-semibold rounded-lg shadow-md mt-2">
+                <a id="booking-link-mobile" href="#" class="block py-2 text-center btn-primary text-white font-semibold rounded-lg shadow-md mt-2">
                     BOOK NOW
                 </a>
-                <span id="admin-login-link-mobile" class="admin-link block py-2 text-center text-sm">Admin Login</span>
+                <!-- Admin link is hidden until auth is ready -->
+                <span id="admin-login-link-mobile" class="admin-link block py-2 text-center text-sm hidden">Admin Login</span>
             </div>
 
             <main class="flex-grow">
                 <!-- Hero Section -->
-                <section class="hero-bg h-[70vh] flex items-center justify-center text-center p-4">
-                    <div class="bg-black bg-opacity-40 p-8 rounded-xl shadow-2xl max-w-2xl mx-auto">
-                        <h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-4 leading-tight">
+                <section id="hero-section" class="hero-bg h-[70vh] flex items-center justify-center text-center p-4">
+                    <div class="bg-black bg-opacity-40 p-8 rounded-xl shadow-2xl max-w-3xl mx-auto">
+                        <h1 class="text-4xl sm:text-5xl font-extrabold text-white mb-4 leading-tight tracking-tight">
                             <span id="site-hero-heading">MTJ HOTELS: Your Gateway to the Taj Mahal</span>
                         </h1>
                         <p class="text-xl text-gray-100 mb-8 font-light">
                             <span id="site-hero-subheading">Comfort, value, and friendly service—just a short walk from the East Gate.</span>
                         </p>
-                        <a href="#booking-form" class="btn-primary text-white text-lg font-bold py-3 px-8 rounded-full shadow-xl">
+                        <a id="booking-link-hero" href="#" class="btn-primary text-white text-lg font-bold py-3 px-8 rounded-full shadow-xl uppercase tracking-wider">
                             CHECK AVAILABILITY
                         </a>
                     </div>
@@ -123,7 +144,7 @@
                                     Comfort & Community in Taj Nagri
                                 </h2>
                                 <p id="site-description-1" class="mt-4 text-gray-600 text-lg leading-relaxed">
-                                    Welcome to MTJ Hotels, your comfortable and convenient home base in the city of the Taj Mahal. Perfectly situated in the vibrant **Taj Nagri** area, we offer an unbeatable combination of **prime location, exceptional value, and friendly service.**
+                                    Welcome to MTJ Hotels, your comfortable and convenient home base in the city of the Taj Mahal. Perfectly situated in the vibrant **Taj Nagri** area, we offer an unbeatable combination of prime location, exceptional value, and friendly service.
                                 </p>
                                 <p id="site-description-2" class="mt-4 text-gray-600 leading-relaxed">
                                     We are dedicated to providing a clean, safe, and welcoming environment, ensuring your trip to Agra is as memorable as the monument itself. Whether you're here to witness the sunrise at the Taj or explore the historical sites, MTJ Hotels is your perfect spot.
@@ -136,98 +157,28 @@
                     </div>
                 </section>
 
-                <!-- Static Sections (Rooms, Amenities, Location - these are static templates which an admin could manually update if required) -->
-                <!-- Rooms & Dorms Section -->
+                <!-- Rooms & Dorms Section (DYNAMIC) -->
                 <section id="rooms" class="py-16 sm:py-24 bg-gray-50">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div class="text-center mb-12">
                             <h2 class="text-3xl font-bold text-gray-900 mb-2">Accommodations for Every Traveler</h2>
                             <p class="text-lg text-gray-600">Affordable comfort, regardless of your travel style.</p>
                         </div>
-                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                            <!-- Card 1: Private Room -->
-                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:shadow-xl transition duration-300">
-                                <img src="https://placehold.co/400x250/f97316/ffffff?text=Deluxe+Private+Room" alt="Deluxe Double Room" class="w-full h-48 object-cover">
-                                <div class="p-6">
-                                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Deluxe Private Rooms</h3>
-                                    <p class="text-gray-600 mb-4 text-sm">Ideal for couples or small families seeking privacy and comfort.</p>
-                                    <ul class="feature-list text-gray-700 text-sm">
-                                        <li>Private attached bathroom</li>
-                                        <li>Comfortable double/triple bedding</li>
-                                        <li>Air-conditioning & high-speed Wi-Fi</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <!-- Card 2: Shared Dormitory -->
-                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:shadow-xl transition duration-300">
-                                <img src="https://placehold.co/400x250/22c55e/ffffff?text=Cozy+Shared+Dorm" alt="Shared Dormitory" class="w-full h-48 object-cover">
-                                <div class="p-6">
-                                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Clean Shared Dormitories</h3>
-                                    <p class="text-gray-600 mb-4 text-sm">Perfect for solo backpackers looking to connect and save.</p>
-                                    <ul class="feature-list text-gray-700 text-sm">
-                                        <li>Secure lockers for belongings</li>
-                                        <li>Comfortable bunk beds</li>
-                                        <li>Male-only and Female-only options</li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <!-- Card 3: Family Room -->
-                            <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:shadow-xl transition duration-300">
-                                <img src="https://placehold.co/400x250/3b82f6/ffffff?text=Spacious+Family+Room" alt="Family Quadruple Room" class="w-full h-48 object-cover">
-                                <div class="p-6">
-                                    <h3 class="text-xl font-semibold text-gray-900 mb-2">Spacious Family Quad Rooms</h3>
-                                    <p class="text-gray-600 mb-4 text-sm">Plenty of space for families or groups traveling together.</p>
-                                    <ul class="feature-list text-gray-700 text-sm">
-                                        <li>Sleeps up to 4 adults</li>
-                                        <li>Private attached bathroom</li>
-                                        <li>Easy access to common areas</li>
-                                    </ul>
-                                </div>
-                            </div>
+                        <div id="rooms-container" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                            <!-- Room cards will be inserted here by JavaScript -->
                         </div>
                     </div>
                 </section>
 
-                <!-- Amenities Section -->
+                <!-- Amenities Section (DYNAMIC) -->
                 <section id="amenities" class="py-16 sm:py-24 bg-white">
                     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div class="text-center mb-12">
                             <h2 class="text-3xl font-bold text-gray-900 mb-2">Signature MTJ Amenities</h2>
                             <p class="text-lg text-gray-600">Everything you need for a comfortable and enjoyable stay in Agra.</p>
                         </div>
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-                            <!-- Amenity 1 -->
-                            <div class="p-6 bg-gray-50 rounded-xl shadow-md">
-                                <div class="text-4xl text-amber-500 mb-3">
-                                    <svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 4h2"></path></svg>
-                                </div>
-                                <p class="font-semibold text-gray-900">Rooftop Terrace</p>
-                                <p class="text-sm text-gray-500">Relax with city views.</p>
-                            </div>
-                            <!-- Amenity 2 -->
-                            <div class="p-6 bg-gray-50 rounded-xl shadow-md">
-                                <div class="text-4xl text-amber-500 mb-3">
-                                    <svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.385l1.042-1.041.5-.5M12 11a7 7 0 00-7 7m7-7a7 7 0 017 7m0 0l-1.042 1.041M12 11h.01M12 11v.01"></path></svg>
-                                </div>
-                                <p class="font-semibold text-gray-900">High-Speed Wi-Fi</p>
-                                <p class="text-sm text-gray-500">Free 50+ Mbps speed in all rooms.</p>
-                            </div>
-                            <!-- Amenity 3 -->
-                            <div class="p-6 bg-gray-50 rounded-xl shadow-md">
-                                <div class="text-4xl text-amber-500 mb-3">
-                                    <svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                </div>
-                                <p class="font-semibold text-gray-900">24-Hour Front Desk</p>
-                                <p class="text-sm text-gray-500">We're here whenever you need us.</p>
-                            </div>
-                            <!-- Amenity 4 -->
-                            <div class="p-6 bg-gray-50 rounded-xl shadow-md">
-                                <div class="text-4xl text-amber-500 mb-3">
-                                    <svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2z"></path></svg>
-                                </div>
-                                <p class="font-semibold text-gray-900">Continental Breakfast</p>
-                                <p class="text-sm text-gray-500">Available daily (surcharge applies).</p>
-                            </div>
+                        <div id="amenities-container" class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+                            <!-- Amenity cards will be inserted here by JavaScript -->
                         </div>
                     </div>
                 </section>
@@ -308,7 +259,6 @@
                                         <option>Private Deluxe Room</option>
                                         <option>Shared Dormitory Bed</option>
                                         <option>Family Quad Room</option>
-                                        <option>Business Double Room</option>
                                     </select>
                                 </div>
                             </div>
@@ -329,45 +279,39 @@
                 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
                     <!-- Contact Info -->
                     <div>
-                        <h4 class="text-xl font-semibold text-amber-500 mb-4"><span id="site-hotel-name-footer">MTJ</span> Hotels</h4>
+                        <h4 class="text-xl font-semibold text-amber-500 mb-4">
+                            <!-- Footer Logo Display -->
+                            <img id="site-logo-footer" src="" alt="MTJ Logo" class="h-8 mr-2 rounded-md inline-block hidden" onerror="this.onerror=null; this.src='https://placehold.co/32x32/f59e0b/ffffff?text=MTJ'">
+                            <span id="site-hotel-name-footer">MTJ</span> Hotels
+                        </h4>
                         <p class="text-sm text-gray-400">
-                            Phase 1, Taj East Gate, MIG Colony,<br> 
-                            Tajganj, Agra, UP, India
+                            <span id="site-address-line1">Phase 1, Taj East Gate,</span><br> 
+                            <span id="site-address-line2">Tajganj, Agra, UP, India</span>
                         </p>
                         <p class="mt-3 text-sm text-gray-400">
                             Email: <span id="site-email">info@mtjhotels.com (Example)</span><br>
                             Phone: <span id="site-phone">+91 98765 43210 (Example)</span>
                         </p>
                     </div>
-                    <!-- Quick Links (Static for simplicity) -->
+                    <!-- Quick Links (DYNAMIC) -->
                     <div>
                         <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
-                        <ul class="space-y-2 text-sm">
-                            <li><a href="#about" class="text-gray-400 hover:text-amber-500 transition duration-150">About Us</a></li>
-                            <li><a href="#rooms" class="text-gray-400 hover:text-amber-500 transition duration-150">Our Rooms</a></li>
-                            <li><a href="#" class="text-gray-400 hover:text-amber-500 transition duration-150">Guest Reviews</a></li>
-                            <li><a href="#" class="text-gray-400 hover:text-amber-500 transition duration-150">FAQs</a></li>
+                        <ul id="quick-links-list" class="space-y-2 text-sm">
+                            <!-- Links populated by JS -->
                         </ul>
                     </div>
-                    <!-- Legal (Static for simplicity) -->
+                    <!-- Legal (DYNAMIC) -->
                     <div>
                         <h4 class="text-lg font-semibold mb-4">Policies</h4>
-                        <ul class="space-y-2 text-sm">
-                            <li><a href="#" class="text-gray-400 hover:text-amber-500 transition duration-150">Privacy Policy</a></li>
-                            <li><a href="#" class="text-gray-400 hover:text-amber-500 transition duration-150">Cancellation Terms</a></li>
-                            <li><a href="#" class="text-gray-400 hover:text-amber-500 transition duration-150">Terms of Service</a></li>
+                        <ul id="policy-links-list" class="space-y-2 text-sm">
+                            <!-- Links populated by JS -->
                         </ul>
                     </div>
-                    <!-- Social (Static for simplicity) -->
+                    <!-- Social (DYNAMIC) -->
                     <div>
                         <h4 class="text-lg font-semibold mb-4">Connect</h4>
-                        <div class="flex space-x-4">
-                            <a href="#" class="text-gray-400 hover:text-amber-500 transition duration-150">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h3V6.3c-.349-.056-1.554-.2-2.977-.2-4.08 0-6.173 2.15-6.173 5.92V13.5H7.5v4H14v-4z"/></svg>
-                            </a>
-                            <a href="#" class="text-gray-400 hover:text-amber-500 transition duration-150">
-                                <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M7.8 2c-2.45 0-4.75 2.3-4.75 4.75v10.5c0 2.45 2.3 4.75 4.75 4.75h8.4c2.45 0 4.75-2.3 4.75-4.75V6.75c0-2.45-2.3-4.75-4.75-4.75h-8.4zm.2 1.5h8c1.9 0 3.25 1.35 3.25 3.25v8c0 1.9-1.35 3.25-3.25 3.25h-8c-1.9 0-3.25-1.35-3.25-3.25v-8c0-1.9 1.35-3.25 3.25-3.25zm.5 2.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5.22-.5.5-.5.5.22.5.5zm4 1.5c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm0 1.5c1.38 0 2.5 1.12 2.5 2.5s-1.12 2.5-2.5 2.5-2.5-1.12-2.5-2.5 1.12-2.5 2.5-2.5z"/></svg>
-                            </a>
+                        <div id="social-links-container" class="flex space-x-4">
+                            <!-- Icons populated by JS -->
                         </div>
                     </div>
                 </div>
@@ -388,48 +332,145 @@
             <main class="flex-grow p-4 sm:p-8 bg-gray-50">
                 <div class="max-w-4xl mx-auto bg-white p-6 rounded-xl shadow-2xl">
                     <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-2">Edit Hotel Configuration (Admin ID: <span id="admin-user-id" class="font-mono text-xs text-amber-600"></span>)</h2>
-                    <div id="admin-message-box" class="hidden p-3 mb-4 rounded-md text-sm font-medium bg-green-100 text-green-800"></div>
+                    <div id="admin-message-box" class="hidden p-3 mb-4 rounded-md text-sm font-medium"></div>
+
+                    <!-- Logo Upload Section -->
+                    <div class="border border-gray-200 p-4 rounded-lg mb-6">
+                        <h3 class="text-lg font-medium text-gray-800 mb-4">Logo Management</h3>
+                        <div class="flex items-center space-x-4 mb-4">
+                            <img id="current-logo-display" src="" alt="Current Logo" class="h-16 w-16 object-contain border rounded-md hidden" onerror="this.onerror=null; this.src='https://placehold.co/64x64/cccccc/ffffff?text=Logo'">
+                            <span id="logo-status" class="text-sm text-gray-500">No logo uploaded yet.</span>
+                        </div>
+                        <div class="flex items-center space-x-4">
+                            <input type="file" id="logo-file-input" accept="image/*" class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100">
+                            <button type="button" id="upload-logo-btn" class="px-4 py-2 rounded-lg bg-amber-600 text-white font-medium hover:bg-amber-700 transition duration-150 disabled:opacity-50" disabled>
+                                Upload Logo
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2">Recommended size: Square, PNG or JPG. Max file size 5MB.</p>
+                    </div>
+
 
                     <form id="config-form" class="space-y-6">
-                        <!-- Hotel Name -->
-                        <div>
-                            <label for="admin-hotel-name" class="block text-sm font-medium text-gray-700">Hotel Name (e.g., MTJ)</label>
-                            <input type="text" id="admin-hotel-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
+                        <!-- BASIC CONFIGURATION -->
+                        <div class="border border-gray-200 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4 border-b pb-2">A. Core Settings & Contact Info</h3>
+                            <!-- Hotel Name -->
+                            <div>
+                                <label for="admin-hotel-name" class="block text-sm font-medium text-gray-700">Hotel Name (e.g., MTJ)</label>
+                                <input type="text" id="admin-hotel-name" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
+                            </div>
+                            <!-- Phone -->
+                            <div>
+                                <label for="admin-phone" class="block text-sm font-medium text-gray-700">Phone Number (e.g., +91 98765 43210)</label>
+                                <input type="tel" id="admin-phone" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
+                            </div>
+                            <!-- Email -->
+                            <div>
+                                <label for="admin-email" class="block text-sm font-medium text-gray-700">Email Address</label>
+                                <input type="email" id="admin-email" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
+                            </div>
+                            <!-- Booking Link -->
+                            <div>
+                                <label for="admin-booking-link" class="block text-sm font-medium text-gray-700">Main Booking Link URL</label>
+                                <input type="url" id="admin-booking-link" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
+                            </div>
+                            <!-- Address Line 1 -->
+                            <div>
+                                <label for="admin-address-line1" class="block text-sm font-medium text-gray-700">Address Line 1 (Street/Locality)</label>
+                                <input type="text" id="admin-address-line1" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
+                            </div>
+                            <!-- Address Line 2 -->
+                            <div>
+                                <label for="admin-address-line2" class="block text-sm font-medium text-gray-700">Address Line 2 (City/State/Zip/Country)</label>
+                                <input type="text" id="admin-address-line2" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
+                            </div>
                         </div>
-                        <!-- Phone -->
-                        <div>
-                            <label for="admin-phone" class="block text-sm font-medium text-gray-700">Phone Number (e.g., +91 98765 43210)</label>
-                            <input type="tel" id="admin-phone" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
+
+                        <!-- HERO & MEDIA CONFIGURATION -->
+                        <div class="border border-gray-200 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4 border-b pb-2">B. Hero Section Text & Image</h3>
+                            <!-- Hero Heading -->
+                            <div>
+                                <label for="admin-hero-heading" class="block text-sm font-medium text-gray-700">Hero Heading</label>
+                                <input type="text" id="admin-hero-heading" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
+                            </div>
+                            <!-- Hero Subheading -->
+                            <div>
+                                <label for="admin-hero-subheading" class="block text-sm font-medium text-gray-700">Hero Subheading</label>
+                                <input type="text" id="admin-hero-subheading" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
+                            </div>
+                            <!-- Hero Background Image URL -->
+                            <div>
+                                <label for="admin-hero-bg-url" class="block text-sm font-medium text-gray-700">Hero Background Image URL (Must be a direct link to an image file)</label>
+                                <input type="url" id="admin-hero-bg-url" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
+                            </div>
                         </div>
-                        <!-- Email -->
-                        <div>
-                            <label for="admin-email" class="block text-sm font-medium text-gray-700">Email Address</label>
-                            <input type="email" id="admin-email" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
-                        </div>
-                        <!-- Hero Heading -->
-                        <div>
-                            <label for="admin-hero-heading" class="block text-sm font-medium text-gray-700">Hero Heading</label>
-                            <input type="text" id="admin-hero-heading" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
-                        </div>
-                        <!-- Hero Subheading -->
-                        <div>
-                            <label for="admin-hero-subheading" class="block text-sm font-medium text-gray-700">Hero Subheading</label>
-                            <input type="text" id="admin-hero-subheading" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500">
-                        </div>
-                         <!-- Description 1 -->
-                        <div>
-                            <label for="admin-description-1" class="block text-sm font-medium text-gray-700">About Section - Paragraph 1</label>
-                            <textarea id="admin-description-1" rows="3" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500"></textarea>
-                        </div>
-                        <!-- Description 2 -->
-                        <div>
-                            <label for="admin-description-2" class="block text-sm font-medium text-gray-700">About Section - Paragraph 2</label>
-                            <textarea id="admin-description-2" rows="3" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500"></textarea>
+
+                        <!-- ABOUT SECTION CONFIGURATION -->
+                        <div class="border border-gray-200 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4 border-b pb-2">C. About Section Description</h3>
+                            <!-- Description 1 -->
+                            <div>
+                                <label for="admin-description-1" class="block text-sm font-medium text-gray-700">Paragraph 1 (Main Introduction)</label>
+                                <textarea id="admin-description-1" rows="3" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500"></textarea>
+                            </div>
+                            <!-- Description 2 -->
+                            <div>
+                                <label for="admin-description-2" class="block text-sm font-medium text-gray-700">Paragraph 2 (Mission/Details)</label>
+                                <textarea id="admin-description-2" rows="3" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-3 focus:ring-amber-500 focus:border-amber-500"></textarea>
+                            </div>
                         </div>
                         
+                        <!-- AMENITIES CONFIGURATION (4 items) -->
+                        <div class="border border-gray-200 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4 border-b pb-2">D. Amenities (4 Key Features)</h3>
+                            <p class="text-sm text-gray-600 mb-4">Note: The icon design is fixed for stability, only the title and description are editable.</p>
+                            <!-- Amenity Forms (Dynamically rendered based on array size) -->
+                            <div id="admin-amenities-form-container" class="space-y-4">
+                                <!-- Forms for amenity 0, 1, 2, 3 will be generated here -->
+                            </div>
+                        </div>
+
+                        <!-- ROOMS CONFIGURATION (6 types) -->
+                        <div class="border border-gray-200 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4 border-b pb-2">E. Room Types (6 Key Cards)</h3>
+                            <p class="text-sm text-gray-600 mb-4">Customize the title, and features for each room type. Separate features with a **semicolon (;)**.</p>
+                            <!-- Room Forms (Dynamically rendered based on array size) -->
+                            <div id="admin-rooms-form-container" class="space-y-6">
+                                <!-- Forms for room 0-5 will be generated here -->
+                            </div>
+                        </div>
+                        
+                        <!-- ROOM MEDIA MANAGEMENT (6 types * 5 images) -->
+                        <div class="border border-gray-200 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4 border-b pb-2">E. Room Media Management (Upload up to 5 images per room)</h3>
+                            <div id="admin-room-media-container" class="space-y-8">
+                                <!-- Media management forms will be generated here -->
+                            </div>
+                        </div>
+
+
+                        <!-- FOOTER LINKS & SOCIAL MEDIA CONFIGURATION -->
+                        <div class="border border-gray-200 p-4 rounded-lg">
+                            <h3 class="text-lg font-medium text-gray-800 mb-4 border-b pb-2">F. Footer Links (Quick, Policy, Social)</h3>
+                            
+                            <!-- Quick Links -->
+                            <h4 class="font-medium text-gray-700 mt-4 mb-2">Quick Links (4)</h4>
+                            <div id="admin-quick-links-form-container" class="space-y-3"></div>
+
+                            <!-- Policy Links -->
+                            <h4 class="font-medium text-gray-700 mt-4 mb-2">Policy Links (3)</h4>
+                            <div id="admin-policy-links-form-container" class="space-y-3"></div>
+
+                            <!-- Social Media Links -->
+                            <h4 class="font-medium text-gray-700 mt-4 mb-2">Social Media URLs (4)</h4>
+                            <div id="admin-social-links-form-container" class="space-y-3"></div>
+                        </div>
+
                         <!-- Save Button -->
                         <button type="submit" id="admin-save-btn" class="w-full btn-primary text-white text-lg font-bold py-3 rounded-lg shadow-xl uppercase tracking-wider disabled:opacity-50" disabled>
-                            Save Configuration
+                            Save All Text Configuration
                         </button>
                     </form>
                 </div>
@@ -442,6 +483,7 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 
         setLogLevel('debug'); // Enable debug logging for Firebase
@@ -452,7 +494,7 @@
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         
         // --- FIREBASE SERVICE INITIALIZATION ---
-        let app, db, auth, userId = null;
+        let app, db, auth, storage, userId = null;
         const configDocId = 'settings'; 
         let isAuthReady = false;
 
@@ -467,16 +509,91 @@
         const adminSaveBtn = document.getElementById('admin-save-btn');
         const adminMessageBox = document.getElementById('admin-message-box');
         const adminUserIdSpan = document.getElementById('admin-user-id');
+        
+        // Dynamic Content Containers
+        const roomsContainer = document.getElementById('rooms-container');
+        const amenitiesContainer = document.getElementById('amenities-container');
+        const adminRoomsFormContainer = document.getElementById('admin-rooms-form-container');
+        const adminAmenitiesFormContainer = document.getElementById('admin-amenities-form-container');
+        const adminRoomMediaContainer = document.getElementById('admin-room-media-container');
+        const quickLinksFormContainer = document.getElementById('admin-quick-links-form-container');
+        const policyLinksFormContainer = document.getElementById('admin-policy-links-form-container');
+        const socialLinksFormContainer = document.getElementById('admin-social-links-form-container');
+        const quickLinksList = document.getElementById('quick-links-list');
+        const policyLinksList = document.getElementById('policy-links-list');
+        const socialLinksContainer = document.getElementById('social-links-container');
 
-        // Initial default configuration structure
+
+        // Logo Upload Elements
+        const logoFileInput = document.getElementById('logo-file-input');
+        const uploadLogoBtn = document.getElementById('upload-logo-btn');
+        const currentLogoDisplay = document.getElementById('current-logo-display');
+        const logoStatus = document.getElementById('logo-status');
+        const heroSection = document.getElementById('hero-section');
+
+        // --- DEFAULT DATA STRUCTURES ---
+
+        // Helper for default room images (to avoid long array in defaultSettings)
+        const generateDefaultRoomImages = () => Array.from({ length: 5 }, (_, i) => ({
+            url: `https://placehold.co/400x250/cccccc/ffffff?text=Room+Pic+${i + 1}`,
+            key: `img${i + 1}`
+        }));
+        
+        // Six Room Types Inventory
+        const defaultRooms = [
+            { id: "dorm", title: "Shared Dormitory (18 Beds)", description: "Cost-effective and social lodging for backpackers.", features: ["18 Secure Bunk Beds", "Private Lockers", "Shared attached bathroom"], images: generateDefaultRoomImages() },
+            { id: "std", title: "Standard Room (4 Available)", description: "Simple, clean, and comfortable private rooms.", features: ["Double Bed", "Private Bathroom", "Air-conditioning"], images: generateDefaultRoomImages() },
+            { id: "dlx", title: "Deluxe Room (4 Available)", description: "Enhanced comfort and space with modern amenities.", features: ["King/Queen Bed", "Premium Linens", "Work Desk"], images: generateDefaultRoomImages() },
+            { id: "fquad", title: "Family Deluxe Quad Room (1 Available)", description: "Spacious room designed for families of four.", features: ["1 Double Bed, 2 Twin Beds", "Large Wardrobe", "Seating Area"], images: generateDefaultRoomImages() },
+            { id: "ftrip", title: "Family Deluxe Triple Room (1 Available)", description: "Comfortable arrangement for three guests.", features: ["1 Double Bed, 1 Single Bed", "Private Bathroom", "Television"], images: generateDefaultRoomImages() },
+            { id: "twin", title: "Twin Room (1 Available)", description: "Two separate beds for friends or colleagues.", features: ["Two Single Beds", "Private Bathroom", "Luggage Rack"], images: generateDefaultRoomImages() }
+        ];
+
+        const defaultAmenities = [
+            { title: "Rooftop Terrace", description: "Relax with city views.", icon: '<svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 4h2"></path></svg>' },
+            { title: "High-Speed Wi-Fi", description: "Free 50+ Mbps speed in all rooms.", icon: '<svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.385l1.042-1.041.5-.5M12 11a7 7 0 00-7 7m7-7a7 7 0 017 7m0 0l-1.042 1.041M12 11h.01M12 11v.01"></path></svg>' },
+            { title: "24-Hour Front Desk", description: "We're here whenever you need us.", icon: '<svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>' },
+            { title: "Continental Breakfast", description: "Available daily (surcharge applies).", icon: '<svg class="w-10 h-10 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 17a2 2 0 012-2h14a2 2 0 012 2v2a2 2 0 01-2 2H5a2 2 0 01-2-2v-2z"></path></svg>' }
+        ];
+
+        const defaultQuickLinks = [
+            { title: "Our Rooms", url: "#rooms" },
+            { title: "Amenities List", url: "#amenities" },
+            { title: "Guest Reviews", url: "#" },
+            { title: "FAQs", url: "#" }
+        ];
+
+        const defaultPolicyLinks = [
+            { title: "Privacy Policy", url: "#" },
+            { title: "Cancellation Terms", url: "#" },
+            { title: "Terms of Service", url: "#" }
+        ];
+
+        const defaultSocialLinks = [
+            { title: "Facebook", url: "#", icon: '<svg class="w-6 h-6 social-icon" viewBox="0 0 24 24"><path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h3V6.3c-.349-.056-1.554-.2-2.977-.2-4.08 0-6.173 2.15-6.173 5.92V13.5H7.5v4H14v-4z"/></svg>' },
+            { title: "Instagram", url: "#", icon: '<svg class="w-6 h-6 social-icon" viewBox="0 0 24 24"><path d="M7.8 2c-2.45 0-4.75 2.3-4.75 4.75v10.5c0 2.45 2.3 4.75 4.75 4.75h8.4c2.45 0 4.75-2.3 4.75-4.75V6.75c0-2.45-2.3-4.75-4.75-4.75h-8.4zm.2 1.5h8c1.9 0 3.25 1.35 3.25 3.25v8c0 1.9-1.35 3.25-3.25 3.25h-8c-1.9 0-3.25-1.35-3.25-3.25v-8c0-1.9 1.35-3.25 3.25-3.25zm.5 2.5c0 .28-.22.5-.5.5s-.5-.22-.5-.5.22-.5.5-.5.5.22.5.5zm4 1.5c-2.2 0-4 1.8-4 4s1.8 4 4 4 4-1.8 4-4-1.8-4-4-4zm0 1.5c1.38 0 2.5 1.12 2.5 2.5s-1.12 2.5-2.5 2.5-2.5-1.12-2.5-2.5 1.12-2.5 2.5-2.5z"/></svg>' },
+            { title: "Twitter", url: "#", icon: '<svg class="w-6 h-6 social-icon" viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.58-2.46.68.88-.53 1.54-1.38 1.85-2.39-.83.5-1.75.87-2.73 1.07C18.3 4.7 17.16 4 15.8 4c-2.39 0-4.34 1.95-4.34 4.34 0 .34.04.67.11.99-3.61-.18-6.8-1.9-8.94-4.52-.37.64-.58 1.38-.58 2.18 0 1.51.77 2.84 1.94 3.61-.72-.02-1.4-.22-2.01-.55v.06c0 2.1 1.49 3.86 3.47 4.25-.36.1-.74.15-1.13.15-.27 0-.53-.03-.79-.07.55 1.72 2.15 2.97 4.04 3.01-1.48 1.16-3.35 1.85-5.38 1.85-.35 0-.7-.02-1.04-.06C3.99 20.31 6.38 21 8.9 21c7.4 0 11.43-6.12 11.43-11.43 0-.37-.01-.74-.04-1.1.79-.57 1.47-1.28 2.01-2.09z"/></svg>' },
+            { title: "LinkedIn", url: "#", icon: '<svg class="w-6 h-6 social-icon" viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5V5c0-2.76-2.24-5-5-5zm-11 19H5V8h3v11zm-1.5-12.25c-.97 0-1.75-.78-1.75-1.75s.78-1.75 1.75-1.75 1.75.78 1.75 1.75-.78 1.75-1.75 1.75zm13.5 12.25h-3V14c0-1.21-.43-2.05-1.5-2.05-.82 0-1.31.55-1.53 1.08-.07.18-.08.41-.08.64V19h-3V8h3v1.27c.4-.64 1.18-1.55 3.05-1.55 2.22 0 3.95 1.44 3.95 4.54V19z"/></svg>'}
+        ];
+
         const defaultSettings = {
             hotelName: "MTJ",
             phone: "+91 98765 43210 (Example)",
             email: "info@mtjhotels.com (Example)",
+            bookingLink: "#",
+            addressLine1: "Phase 1, Taj East Gate, MIG Colony,",
+            addressLine2: "Tajganj, Agra, UP, India",
             heroHeading: "MTJ HOTELS: Your Gateway to the Taj Mahal",
             heroSubheading: "Comfort, value, and friendly service—just a short walk from the East Gate.",
+            heroBgUrl: 'https://placehold.co/1200x600/1e293b/ffffff?text=Luxury+Hotel+Interior+Placeholder',
             description1: "Welcome to MTJ Hotels, your comfortable and convenient home base in the city of the Taj Mahal. Perfectly situated in the vibrant Taj Nagri area, we offer an unbeatable combination of prime location, exceptional value, and friendly service.",
-            description2: "We are dedicated to providing a clean, safe, and welcoming environment, ensuring your trip to Agra is as memorable as the monument itself. Whether you're here to witness the sunrise at the Taj or explore the historical sites, MTJ Hotels is your perfect spot."
+            description2: "We are dedicated to providing a clean, safe, and welcoming environment, ensuring your trip to Agra is as memorable as the monument itself. Whether you're here to witness the sunrise at the Taj or explore the historical sites, MTJ Hotels is your perfect spot.",
+            logoUrl: "", // Default empty logo URL
+            amenities: defaultAmenities,
+            rooms: defaultRooms,
+            quickLinks: defaultQuickLinks,
+            policyLinks: defaultPolicyLinks,
+            socialLinks: defaultSocialLinks
         };
 
         // --- CORE FUNCTIONS ---
@@ -486,6 +603,7 @@
                 app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
+                storage = getStorage(app); 
                 
                 if (initialAuthToken) {
                     await signInWithCustomToken(auth, initialAuthToken);
@@ -493,36 +611,40 @@
                     await signInAnonymously(auth);
                 }
 
-                // Auth state observer for setting up user-dependent features
                 onAuthStateChanged(auth, (user) => {
                     if (user) {
                         userId = user.uid;
                         adminUserIdSpan.textContent = userId;
                         isAuthReady = true;
                         
-                        // Start listening to hotel configuration once authenticated
+                        adminLoginLink.classList.remove('hidden');
+                        adminLoginLinkMobile.classList.remove('hidden');
+
                         listenToHotelConfig();
+                        
+                        uploadLogoBtn.disabled = false; 
                     } else {
-                        // Handle anonymous user or sign-out state (optional)
                         userId = crypto.randomUUID(); 
                         isAuthReady = true;
                         
-                        // Use default settings if no specific user is authenticated
+                        adminLoginLink.classList.add('hidden');
+                        adminLoginLinkMobile.classList.add('hidden');
+
                         updateSiteUI(defaultSettings);
                         hideLoading();
+                        
+                        uploadLogoBtn.disabled = true;
                     }
                 });
 
             } catch (error) {
                 console.error("Firebase initialization or authentication failed:", error);
-                // Fallback to defaults and hide loading on error
                 updateSiteUI(defaultSettings);
                 hideLoading();
             }
         }
 
         function getHotelConfigRef(uid) {
-            // Private data path for the hotel configuration
             return doc(db, 'artifacts', appId, 'users', uid, 'hotel_config', configDocId);
         }
 
@@ -535,11 +657,8 @@
                 let settings;
                 if (docSnap.exists()) {
                     settings = docSnap.data();
-                    console.log("Current hotel config:", settings);
                 } else {
-                    console.log("No config found, setting defaults and creating document.");
                     settings = defaultSettings;
-                    // Attempt to create the document with defaults if it doesn't exist
                     setDoc(docRef, defaultSettings).catch(e => console.error("Error creating default config:", e));
                 }
                 
@@ -566,39 +685,249 @@
             }, 300);
         }
 
-        function updateSiteUI(settings) {
-            document.getElementById('page-title').textContent = `${settings.hotelName} Hotels - Your Gateway to the Taj Mahal`;
-            document.getElementById('site-hotel-name-header').textContent = settings.hotelName;
-            document.getElementById('site-hero-heading').textContent = settings.heroHeading;
-            document.getElementById('site-hero-subheading').textContent = settings.heroSubheading;
-            document.getElementById('site-description-1').innerHTML = settings.description1;
-            document.getElementById('site-description-2').innerHTML = settings.description2;
-            document.getElementById('site-location-name').textContent = settings.hotelName;
-            document.getElementById('site-hotel-name-footer').textContent = settings.hotelName;
-            document.getElementById('site-hotel-name-copy').textContent = settings.hotelName;
-            
-            document.getElementById('site-email').textContent = settings.email;
-            document.getElementById('site-phone').textContent = settings.phone;
+        // --- DYNAMIC RENDERING FUNCTIONS ---
+        function renderRooms(rooms) {
+            roomsContainer.innerHTML = rooms.map((room, index) => {
+                const imageUrl = room.images && room.images.length > 0 ? room.images[0].url : 'https://placehold.co/400x250/cccccc/000000?text=Room+Image';
+
+                return `
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform hover:scale-[1.02] transition duration-300">
+                    <img src="${imageUrl}" alt="${room.title}" class="w-full h-48 object-cover" onerror="this.onerror=null; this.src='https://placehold.co/400x250/cccccc/000000?text=Room+Image'">
+                    <div class="p-6">
+                        <h3 class="text-xl font-semibold text-gray-900 mb-2">${room.title}</h3>
+                        <p class="text-gray-600 mb-4 text-sm">${room.description}</p>
+                        <ul class="feature-list text-gray-700 text-sm">
+                            ${room.features.map(f => `<li>${f}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `}).join('');
         }
 
+        function renderAmenities(amenities) {
+            amenitiesContainer.innerHTML = amenities.map((a, index) => `
+                <div class="p-6 bg-gray-50 rounded-xl shadow-md border-t-4 border-amber-500">
+                    <div class="text-4xl text-amber-500 mb-3">
+                        ${a.icon}
+                    </div>
+                    <p class="font-semibold text-gray-900">${a.title}</p>
+                    <p class="text-sm text-gray-500">${a.description}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderFooterLinks(quickLinks, policyLinks, socialLinks) {
+            // Quick Links
+            quickLinksList.innerHTML = quickLinks.map(link => `
+                <li><a href="${link.url}" class="text-gray-400 hover:text-amber-500 transition duration-150">${link.title}</a></li>
+            `).join('');
+
+            // Policy Links
+            policyLinksList.innerHTML = policyLinks.map(link => `
+                <li><a href="${link.url}" class="text-gray-400 hover:text-amber-500 transition duration-150">${link.title}</a></li>
+            `).join('');
+            
+            // Social Links
+            socialLinksContainer.innerHTML = socialLinks.map(s => {
+                // Determine icon based on title (for dynamic social links)
+                let iconSvg = '';
+                if (s.title.toLowerCase() === 'facebook') iconSvg = defaultSocialLinks[0].icon;
+                else if (s.title.toLowerCase() === 'instagram') iconSvg = defaultSocialLinks[1].icon;
+                else if (s.title.toLowerCase() === 'twitter') iconSvg = defaultSocialLinks[2].icon;
+                else if (s.title.toLowerCase() === 'linkedin') iconSvg = defaultSocialLinks[3].icon;
+                
+                return s.url && s.url !== '#' ? `<a href="${s.url}" target="_blank" class="text-gray-400 hover:text-amber-500 transition duration-150">${iconSvg}</a>` : '';
+            }).join('');
+        }
+        
+        // --- PUBLIC UI UPDATES ---
+        function updateSiteUI(settings) {
+            // A. Core Settings
+            document.getElementById('page-title').textContent = `${settings.hotelName} Hotels - Your Gateway to the Taj Mahal`;
+            document.getElementById('site-hotel-name-header').textContent = settings.hotelName;
+            document.getElementById('site-location-name').textContent = settings.hotelName;
+            document.getElementById('site-email').textContent = settings.email;
+            document.getElementById('site-phone').textContent = settings.phone;
+            document.getElementById('site-address-line1').textContent = settings.addressLine1;
+            document.getElementById('site-address-line2').textContent = settings.addressLine2;
+            
+            // Update Booking Links
+            document.getElementById('booking-link-header').href = settings.bookingLink;
+            document.getElementById('booking-link-mobile').href = settings.bookingLink;
+            document.getElementById('booking-link-hero').href = settings.bookingLink;
+
+            // B. Hero & Media
+            document.getElementById('site-hero-heading').textContent = settings.heroHeading;
+            document.getElementById('site-hero-subheading').textContent = settings.heroSubheading;
+            heroSection.style.backgroundImage = `url('${settings.heroBgUrl}')`;
+            
+            // C. About Section
+            document.getElementById('site-description-1').innerHTML = settings.description1;
+            document.getElementById('site-description-2').innerHTML = settings.description2;
+
+            // D & E. Dynamic Content
+            renderRooms(settings.rooms);
+            renderAmenities(settings.amenities);
+
+            // F. Footer & Links
+            renderFooterLinks(settings.quickLinks, settings.policyLinks, settings.socialLinks);
+
+            // Logo Display Logic
+            const logoUrl = settings.logoUrl || '';
+            const headerLogo = document.getElementById('site-logo-header');
+            const footerLogo = document.getElementById('site-logo-footer');
+            const headerText = document.getElementById('site-hotel-name-header');
+            const footerText = document.getElementById('site-hotel-name-footer');
+            const copyText = document.getElementById('site-hotel-name-copy');
+            
+            if (logoUrl) {
+                headerLogo.src = logoUrl;
+                headerLogo.classList.remove('hidden');
+                headerText.classList.add('hidden');
+                
+                footerLogo.src = logoUrl;
+                footerLogo.classList.remove('hidden');
+                footerText.classList.add('hidden');
+                copyText.textContent = settings.hotelName; 
+            } else {
+                headerLogo.classList.add('hidden');
+                headerText.classList.remove('hidden');
+                
+                footerLogo.classList.add('hidden');
+                footerText.classList.remove('hidden');
+                copyText.textContent = settings.hotelName;
+            }
+        }
+
+        // --- ADMIN UI UPDATES ---
         function updateAdminForm(settings) {
+            // A. Core Settings
             document.getElementById('admin-hotel-name').value = settings.hotelName;
             document.getElementById('admin-phone').value = settings.phone;
             document.getElementById('admin-email').value = settings.email;
+            document.getElementById('admin-booking-link').value = settings.bookingLink;
+            document.getElementById('admin-address-line1').value = settings.addressLine1;
+            document.getElementById('admin-address-line2').value = settings.addressLine2;
+            
+            // B. Hero & Media
             document.getElementById('admin-hero-heading').value = settings.heroHeading;
             document.getElementById('admin-hero-subheading').value = settings.heroSubheading;
+            document.getElementById('admin-hero-bg-url').value = settings.heroBgUrl;
+
+            // C. About Section
             document.getElementById('admin-description-1').value = settings.description1;
             document.getElementById('admin-description-2').value = settings.description2;
-            adminSaveBtn.disabled = false; // Enable save button when data is loaded
+            
+            // D & E. Dynamic Content Forms
+            renderAdminAmenitiesForm(settings.amenities);
+            renderAdminRoomsForm(settings.rooms);
+            renderAdminRoomMediaManagement(settings.rooms);
+
+            // F. Footer Links
+            renderAdminLinksForm(settings.quickLinks, 'quick');
+            renderAdminLinksForm(settings.policyLinks, 'policy');
+            renderAdminLinksForm(settings.socialLinks, 'social');
+
+
+            // Logo Display
+            const logoUrl = settings.logoUrl || '';
+            if (logoUrl) {
+                currentLogoDisplay.src = logoUrl;
+                currentLogoDisplay.classList.remove('hidden');
+                logoStatus.textContent = "Logo uploaded. Use 'Upload Logo' to replace.";
+            } else {
+                currentLogoDisplay.classList.add('hidden');
+                logoStatus.textContent = "No logo uploaded yet.";
+            }
+
+            adminSaveBtn.disabled = false; 
         }
+        
+        // --- ADMIN FORM RENDERING ---
+
+        function renderAdminAmenitiesForm(amenities) {
+            adminAmenitiesFormContainer.innerHTML = amenities.map((a, index) => `
+                <div class="border border-amber-200 p-3 rounded-lg bg-amber-50/50">
+                    <h4 class="font-medium text-gray-700 mb-2">Amenity ${index + 1}: ${a.title}</h4>
+                    <label class="block text-xs font-medium text-gray-600">Title</label>
+                    <input type="text" id="admin-amenity-${index}-title" value="${a.title}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm">
+                    <label class="block text-xs font-medium text-gray-600 mt-2">Description</label>
+                    <input type="text" id="admin-amenity-${index}-description" value="${a.description}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm">
+                    <input type="hidden" id="admin-amenity-${index}-icon" value="${encodeURIComponent(a.icon)}">
+                </div>
+            `).join('');
+        }
+
+        function renderAdminRoomsForm(rooms) {
+            adminRoomsFormContainer.innerHTML = rooms.map((r, index) => `
+                <div class="border border-green-200 p-3 rounded-lg bg-green-50/50">
+                    <h4 class="font-medium text-gray-700 mb-2">Room Type ${index + 1}: ${r.title} (ID: ${r.id})</h4>
+                    <label class="block text-xs font-medium text-gray-600">Title</label>
+                    <input type="text" id="admin-room-${index}-title" value="${r.title}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm">
+                    <label class="block text-xs font-medium text-gray-600 mt-2">Description</label>
+                    <input type="text" id="admin-room-${index}-description" value="${r.description}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm">
+                    <label class="block text-xs font-medium text-gray-600 mt-2">Key Features (Separate with ';')</label>
+                    <textarea id="admin-room-${index}-features" rows="2" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm">${r.features.join(';')}</textarea>
+                    <input type="hidden" id="admin-room-${index}-id" value="${r.id}">
+                </div>
+            `).join('');
+        }
+        
+        // --- ROOM MEDIA MANAGEMENT FORM ---
+        function renderAdminRoomMediaManagement(rooms) {
+            adminRoomMediaContainer.innerHTML = rooms.map((room, roomIndex) => `
+                <div class="border border-blue-200 p-4 rounded-lg bg-blue-50/50">
+                    <h4 class="font-medium text-gray-800 mb-4">Media for: ${room.title}</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-5 gap-3">
+                        ${room.images.map((image, imageIndex) => `
+                            <div class="border border-gray-300 p-2 rounded-lg bg-white shadow-sm">
+                                <p class="text-xs font-semibold mb-1">Image Slot ${imageIndex + 1}</p>
+                                <img src="${image.url}" alt="${room.title} Slot ${imageIndex + 1}" class="w-full h-16 object-cover mb-2 rounded-md" onerror="this.onerror=null; this.src='https://placehold.co/64x64/cccccc/000000?text=Empty'">
+                                <input type="file" id="media-upload-${room.id}-${imageIndex}" accept="image/*" class="text-xs text-gray-500 file:py-1 file:px-2 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-blue-50 file:text-blue-700 w-full mb-1">
+                                <button type="button" class="upload-room-media-btn w-full px-2 py-1 text-xs rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition" data-room-id="${room.id}" data-slot-index="${imageIndex}" data-image-key="${image.key}">
+                                    Upload & Link
+                                </button>
+                                <p id="media-status-${room.id}-${imageIndex}" class="text-xs text-center text-gray-500 mt-1 truncate">Current URL: ${image.url.substring(0, 20)}...</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <p class="text-xs text-gray-500 mt-4">Note: The first image (Slot 1) is used as the main card image on the public site.</p>
+                </div>
+            `).join('');
+            
+            // Re-attach listeners for the dynamically created buttons
+            document.querySelectorAll('.upload-room-media-btn').forEach(button => {
+                button.addEventListener('click', handleRoomMediaUpload);
+            });
+        }
+        
+        function renderAdminLinksForm(links, type) {
+            const container = document.getElementById(`admin-${type}-links-form-container`);
+            container.innerHTML = links.map((link, index) => `
+                <div class="flex space-x-2 border-b border-gray-100 pb-2">
+                    <div class="w-1/3">
+                        <label class="block text-xs font-medium text-gray-600">Title (${link.title})</label>
+                        <input type="text" id="admin-${type}-${index}-title" value="${link.title}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm">
+                    </div>
+                    <div class="w-2/3">
+                        <label class="block text-xs font-medium text-gray-600">URL</label>
+                        <input type="url" id="admin-${type}-${index}-url" value="${link.url}" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 text-sm">
+                    </div>
+                    ${type === 'social' ? `<input type="hidden" id="admin-social-${index}-icon" value="${encodeURIComponent(link.icon)}">` : ''}
+                </div>
+            `).join('');
+        }
+
 
         function showMessage(message, isSuccess = true) {
             adminMessageBox.textContent = message;
             adminMessageBox.classList.remove('hidden', 'bg-red-100', 'text-red-800', 'bg-green-100', 'text-green-800');
             if (isSuccess) {
                 adminMessageBox.classList.add('bg-green-100', 'text-green-800');
+                adminMessageBox.classList.remove('bg-red-100', 'text-red-800');
             } else {
                 adminMessageBox.classList.add('bg-red-100', 'text-red-800');
+                adminMessageBox.classList.remove('bg-green-100', 'text-green-800');
             }
             setTimeout(() => adminMessageBox.classList.add('hidden'), 5000);
         }
@@ -608,42 +937,147 @@
                 publicSiteView.classList.add('hidden');
                 adminView.classList.remove('hidden');
                 document.title = "MTJ Hotels - Admin Dashboard";
+                if (isAuthReady && userId) {
+                    getDoc(getHotelConfigRef(userId)).then(docSnap => {
+                        if (docSnap.exists()) {
+                            updateAdminForm(docSnap.data());
+                        } else {
+                            updateAdminForm(defaultSettings);
+                        }
+                    }).catch(e => console.error("Error loading admin form data:", e));
+                }
             } else {
                 adminView.classList.add('hidden');
                 publicSiteView.classList.remove('hidden');
                 document.title = document.getElementById('page-title').textContent;
             }
-            // Reset scroll position
             window.scrollTo(0, 0);
         }
+        
+        // --- LOGO UPLOAD FUNCTIONALITY ---
+        uploadLogoBtn.addEventListener('click', async () => {
+            const file = logoFileInput.files[0];
+            
+            if (!file) {
+                showMessage("Please select an image file to upload.", false);
+                return;
+            }
+            
+            const MAX_SIZE = 5 * 1024 * 1024; 
+            if (file.size > MAX_SIZE) {
+                showMessage("File size exceeds 5MB limit.", false);
+                return;
+            }
 
-        // --- EVENT LISTENERS ---
+            if (!storage || !userId) {
+                 showMessage("Error: Storage service not ready.", false);
+                 return;
+            }
 
-        // Switch to Admin View
-        adminLoginLink.addEventListener('click', (e) => {
+            const oldText = uploadLogoBtn.textContent;
+            uploadLogoBtn.textContent = 'Uploading...';
+            uploadLogoBtn.disabled = true;
+            logoStatus.textContent = 'Uploading file... do not close this window.';
+
+            try {
+                const storageRef = ref(storage, `artifacts/${appId}/users/${userId}/logo.png`);
+                await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(storageRef);
+                
+                const docRef = getHotelConfigRef(userId);
+                const docSnap = await getDoc(docRef);
+                const currentSettings = docSnap.exists() ? docSnap.data() : defaultSettings;
+
+                await setDoc(docRef, { ...currentSettings, logoUrl: downloadURL });
+
+                showMessage("Logo uploaded and saved successfully!");
+                logoFileInput.value = ''; 
+                logoStatus.textContent = 'Logo uploaded. Use Upload to replace.';
+
+            } catch (error) {
+                console.error("Logo upload failed:", error);
+                showMessage(`Logo upload failed: ${error.message}`, false);
+                logoStatus.textContent = 'Upload failed.';
+            } finally {
+                uploadLogoBtn.textContent = oldText;
+                uploadLogoBtn.disabled = false;
+            }
+        });
+
+        // --- ROOM MEDIA UPLOAD FUNCTIONALITY ---
+        async function handleRoomMediaUpload(e) {
+            const button = e.currentTarget;
+            const roomId = button.dataset.roomId;
+            const slotIndex = parseInt(button.dataset.slotIndex);
+            const imageKey = button.dataset.imageKey; 
+            
+            const fileInput = document.getElementById(`media-upload-${roomId}-${slotIndex}`);
+            const statusElement = document.getElementById(`media-status-${roomId}-${slotIndex}`);
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showMessage("Please select an image file.", false);
+                return;
+            }
+            
+            const oldText = button.textContent;
+            button.textContent = 'Uploading...';
+            button.disabled = true;
+            statusElement.textContent = 'Uploading...';
+
+            try {
+                // 1. Upload file to Storage
+                const storageRef = ref(storage, `artifacts/${appId}/users/${userId}/rooms/${roomId}/${imageKey}.jpg`);
+                await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(storageRef);
+
+                // 2. Update Firestore document
+                const docRef = getHotelConfigRef(userId);
+                const docSnap = await getDoc(docRef);
+                let currentSettings = docSnap.exists() ? docSnap.data() : defaultSettings;
+
+                const roomIndex = currentSettings.rooms.findIndex(r => r.id === roomId);
+                if (roomIndex === -1) throw new Error("Room ID not found.");
+
+                currentSettings.rooms[roomIndex].images[slotIndex].url = downloadURL;
+
+                await setDoc(docRef, { ...currentSettings });
+                
+                showMessage(`Image Slot ${slotIndex + 1} for ${roomId} updated successfully!`);
+                statusElement.textContent = `Current URL: ${downloadURL.substring(0, 20)}...`;
+
+            } catch (error) {
+                console.error("Room Media upload failed:", error);
+                showMessage(`Media upload failed for ${roomId}: ${error.message}`, false);
+                statusElement.textContent = 'Upload failed!';
+            } finally {
+                button.textContent = oldText;
+                button.disabled = false;
+            }
+        }
+
+
+        // --- EVENT LISTENERS (Standard) ---
+
+        const handleAdminLogin = (e) => {
             e.preventDefault();
             if (isAuthReady && auth.currentUser) {
                 toggleView('admin');
             } else {
-                showMessage("Authentication not ready. Please wait a moment.", false);
+                showMessage("Authentication is still initializing. Please wait until the 'Initializing App...' message disappears.", false);
             }
-        });
-        adminLoginLinkMobile.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (isAuthReady && auth.currentUser) {
-                document.getElementById('mobile-menu').classList.add('hidden');
-                toggleView('admin');
-            } else {
-                showMessage("Authentication not ready. Please wait a moment.", false);
-            }
-        });
+        };
+
+        adminLoginLink.addEventListener('click', handleAdminLogin);
+        adminLoginLinkMobile.addEventListener('click', handleAdminLogin);
+
 
         // Logout (Switches back to public view)
         adminLogoutBtn.addEventListener('click', () => {
             toggleView('site');
         });
 
-        // Handle Admin Form Submission
+        // Handle Admin Form Submission (ALL Fields)
         configForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (!userId || !db) return;
@@ -651,25 +1085,96 @@
             adminSaveBtn.textContent = 'Saving...';
             adminSaveBtn.disabled = true;
 
-            const newSettings = {
+            // D. Amenities parsing
+            const amenities = Array.from({ length: defaultAmenities.length }).map((_, index) => ({
+                title: document.getElementById(`admin-amenity-${index}-title`).value,
+                description: document.getElementById(`admin-amenity-${index}-description`).value,
+                icon: decodeURIComponent(document.getElementById(`admin-amenity-${index}-icon`).value), 
+            }));
+
+            // E. Rooms parsing
+            const rooms = Array.from({ length: defaultRooms.length }).map((_, index) => {
+                const featuresString = document.getElementById(`admin-room-${index}-features`).value;
+                const roomId = document.getElementById(`admin-room-${index}-id`).value;
+                
+                return {
+                    id: roomId,
+                    title: document.getElementById(`admin-room-${index}-title`).value,
+                    description: document.getElementById(`admin-room-${index}-description`).value,
+                    // Note: images array is merged later to avoid losing URLs during text save
+                    features: featuresString.split(';').map(f => f.trim()).filter(f => f.length > 0)
+                };
+            });
+            
+            // F. Footer Links parsing
+            const quickLinks = Array.from({ length: defaultQuickLinks.length }).map((_, index) => ({
+                title: document.getElementById(`admin-quick-${index}-title`).value,
+                url: document.getElementById(`admin-quick-${index}-url`).value
+            }));
+            const policyLinks = Array.from({ length: defaultPolicyLinks.length }).map((_, index) => ({
+                title: document.getElementById(`admin-policy-${index}-title`).value,
+                url: document.getElementById(`admin-policy-${index}-url`).value
+            }));
+            const socialLinks = Array.from({ length: defaultSocialLinks.length }).map((_, index) => ({
+                title: document.getElementById(`admin-social-${index}-title`).value,
+                url: document.getElementById(`admin-social-${index}-url`).value,
+                icon: decodeURIComponent(document.getElementById(`admin-social-${index}-icon`).value) 
+            }));
+
+            const newTextSettings = {
+                // A. Core Settings
                 hotelName: document.getElementById('admin-hotel-name').value,
                 phone: document.getElementById('admin-phone').value,
                 email: document.getElementById('admin-email').value,
+                bookingLink: document.getElementById('admin-booking-link').value,
+                addressLine1: document.getElementById('admin-address-line1').value,
+                addressLine2: document.getElementById('admin-address-line2').value,
+                
+                // B. Hero & Media
                 heroHeading: document.getElementById('admin-hero-heading').value,
                 heroSubheading: document.getElementById('admin-hero-subheading').value,
+                heroBgUrl: document.getElementById('admin-hero-bg-url').value,
+
+                // C. About Section
                 description1: document.getElementById('admin-description-1').value,
                 description2: document.getElementById('admin-description-2').value,
+                
+                amenities: amenities,
+                quickLinks: quickLinks,
+                policyLinks: policyLinks,
+                socialLinks: socialLinks
             };
+
 
             try {
                 const docRef = getHotelConfigRef(userId);
-                await setDoc(docRef, newSettings);
-                showMessage("Configuration saved successfully!");
+                
+                // Get current settings to preserve logoUrl and room image URLs
+                const docSnap = await getDoc(docRef);
+                const currentSettings = docSnap.exists() ? docSnap.data() : defaultSettings;
+                
+                // Merge room text updates with existing image URLs
+                const mergedRooms = currentSettings.rooms.map(existingRoom => {
+                    const updatedRoomText = rooms.find(r => r.id === existingRoom.id);
+                    if (updatedRoomText) {
+                        return { ...existingRoom, ...updatedRoomText }; // Merges text changes, preserves existing images array
+                    }
+                    return existingRoom; // Should not happen if room IDs are stable
+                });
+                
+                const finalSettings = {
+                    ...currentSettings, 
+                    ...newTextSettings,
+                    rooms: mergedRooms
+                };
+
+                await setDoc(docRef, finalSettings);
+                showMessage("All Configuration saved successfully! Public site updating in real-time.");
             } catch (error) {
                 console.error("Error saving configuration:", error);
                 showMessage(`Error saving configuration: ${error.message}`, false);
             } finally {
-                adminSaveBtn.textContent = 'Save Configuration';
+                adminSaveBtn.textContent = 'Save All Text Configuration';
                 adminSaveBtn.disabled = false;
             }
         });
