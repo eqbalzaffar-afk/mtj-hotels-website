@@ -15,10 +15,22 @@
         import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
         import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
 
-        // IMPORTANT: Use the global variables provided by the Canvas environment
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        // Define and safely access environment globals
+        let envAppId;
+        let envFirebaseConfig;
+        let envInitialAuthToken;
+        
+        try {
+            envAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            envFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            envInitialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        } catch (e) {
+            console.error("Error parsing Firebase configuration:", e);
+        }
+
+        const appId = envAppId;
+        const firebaseConfig = envFirebaseConfig;
+        const initialAuthToken = envInitialAuthToken;
         
         // Define Firestore paths
         const DB_COLLECTION_NAME = 'hotelContent';
@@ -84,6 +96,12 @@
         async function initFirebase() {
             try {
                 // setLogLevel('debug');
+                
+                // CRITICAL CHECK: Ensure configuration is valid before proceeding
+                if (!firebaseConfig || Object.keys(firebaseConfig).length === 0) {
+                     throw new Error("Firebase configuration object is empty or invalid.");
+                }
+
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
                 auth = getAuth(app);
@@ -100,18 +118,20 @@
                     if (user) {
                         userId = user.uid;
                         isAuthReady = true;
+                        console.log("Firebase Auth Ready. User ID:", userId);
                         loadContent();
                     } else {
                         userId = null;
                         isAuthReady = true;
+                        console.log("Firebase Auth Ready. Signed in Anonymously.");
                         loadContent(); 
                     }
                 });
 
             } catch (error) {
-                console.error("Firebase Initialization Error:", error);
+                console.error("CRITICAL: Firebase Initialization Error:", error);
                 showMessage("Database connection failed. Content cannot be saved.", 'error');
-                isAuthReady = true; 
+                isAuthReady = false; // Ensure saving is blocked if critical services fail
             }
         }
         
@@ -202,7 +222,7 @@
                 });
 
             } catch (error) {
-                console.error("Error fetching document:", error);
+                console.error("Error loading content:", error);
                 showMessage("Failed to load content from database.", 'error');
             }
         }
@@ -237,7 +257,7 @@
 
                 // Update Firestore with the new URL
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', DB_COLLECTION_NAME, DB_DOCUMENT_ID);
-                await setDoc({ [fieldName]: downloadURL }, docRef, { merge: true });
+                await setDoc(docRef, { [fieldName]: downloadURL }, { merge: true });
 
                 // Update UI instantly
                 updateMedia(targetEl, downloadURL);
