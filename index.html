@@ -50,6 +50,8 @@
             color: #f59e0b;
             text-decoration: underline;
             margin-left: 1rem;
+            /* FORCED VISIBILITY FIX */
+            display: inline !important; 
         }
         .text-logo-span {
             font-size: 1.5rem;
@@ -955,6 +957,14 @@
         }
         
         // --- LOGO UPLOAD FUNCTIONALITY ---
+        logoFileInput.addEventListener('change', () => {
+             if (logoFileInput.files.length > 0) {
+                 uploadLogoBtn.disabled = false;
+             } else {
+                 uploadLogoBtn.disabled = true;
+             }
+        });
+
         uploadLogoBtn.addEventListener('click', async () => {
             const file = logoFileInput.files[0];
             
@@ -1045,6 +1055,11 @@
                 
                 showMessage(`Image Slot ${slotIndex + 1} for ${roomId} updated successfully!`);
                 statusElement.textContent = `Current URL: ${downloadURL.substring(0, 20)}...`;
+                
+                // Update image preview immediately
+                const imgPreview = button.closest('.bg-white').querySelector('img');
+                if (imgPreview) imgPreview.src = downloadURL;
+
 
             } catch (error) {
                 console.error("Room Media upload failed:", error);
@@ -1064,7 +1079,8 @@
             if (isAuthReady && auth.currentUser) {
                 toggleView('admin');
             } else {
-                showMessage("Authentication is still initializing. Please wait until the 'Initializing App...' message disappears.", false);
+                // If link is clicked but auth is not 100% ready (shouldn't happen with forced visibility)
+                showMessage("Authentication is still initializing. Please wait and try again.", false);
             }
         };
 
@@ -1157,9 +1173,13 @@
                 const mergedRooms = currentSettings.rooms.map(existingRoom => {
                     const updatedRoomText = rooms.find(r => r.id === existingRoom.id);
                     if (updatedRoomText) {
-                        return { ...existingRoom, ...updatedRoomText }; // Merges text changes, preserves existing images array
+                        return { 
+                            ...existingRoom, 
+                            ...updatedRoomText,
+                            images: existingRoom.images // Explicitly preserve existing image array
+                        }; 
                     }
-                    return existingRoom; // Should not happen if room IDs are stable
+                    return existingRoom;
                 });
                 
                 const finalSettings = {
