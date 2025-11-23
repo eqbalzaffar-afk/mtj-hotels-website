@@ -491,9 +491,16 @@
         setLogLevel('debug'); // Enable debug logging for Firebase
 
         // --- GLOBAL SETUP ---
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'mtj-default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        const firebaseConfig = {
+            apiKey: "AIzaSyAD70K4RSoSvrwMZa9LPH7YaUJ1pAtcV0o",
+            authDomain: "mtj-hotels.firebaseapp.com",
+            projectId: "mtj-hotels",
+            storageBucket: "mtj-hotels.firebasestorage.app",
+            messagingSenderId: "384397660784",
+            appId: "1:384397660784:web:089bcealc72f4560a26245"
+        };
+        const appId = firebaseConfig.projectId; // Use the projectId as the unique identifier
+        const initialAuthToken = null; // We use Anonymous Sign-in instead
         
         // --- FIREBASE SERVICE INITIALIZATION ---
         let app, db, auth, storage, userId = null;
