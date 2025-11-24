@@ -1,742 +1,518 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MTJ Hotels - Luxury Accommodations in Agra</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Firebase SDK Imports -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+  <!-- Meta & SEO -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MTJ Hotel Agra | Boutique stays near Taj Mahal</title>
+  <meta name="description" content="MTJ Hotel Agra offers boutique rooms and a cozy restaurant near the Taj Mahal East Gate. Book your stay today." />
+  <meta property="og:title" content="MTJ Hotel Agra" />
+  <meta property="og:description" content="Boutique rooms and a cozy restaurant near the Taj Mahal East Gate." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="images/hero.jpg" />
 
-        // Define and safely access environment globals
-        let envAppId;
-        let envFirebaseConfig;
-        let envInitialAuthToken;
-        
-        try {
-            envAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            envFirebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-            envInitialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-        } catch (e) {
-            console.error("Error parsing Firebase configuration:", e);
-        }
+  <!-- Bootstrap & Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
 
-        const appId = envAppId;
-        const firebaseConfig = envFirebaseConfig;
-        const initialAuthToken = envInitialAuthToken;
-        
-        // Define Firestore paths
-        const DB_COLLECTION_NAME = 'hotelContent';
-        const DB_DOCUMENT_ID = 'mainPage'; 
+  <!-- AOS Animations -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css">
 
-        // Global Firebase instances and state
-        let db;
-        let auth;
-        let storage; // Firebase Storage instance
-        let isAuthReady = false;
-        let userId = null;
-        let adminMode = false;
+  <style>
+    /* Brand palette */
+    :root {
+      --brand-primary: #8c6b3b;  /* warm gold-brown */
+      --brand-dark: #222;
+      --brand-light: #f7f7f7;
+    }
 
-        // Default Content based on user request and common format
-        const defaultContent = {
-            // Text Content Defaults
-            heroTitle: "MTJ Hotels - Your Gateway to the Taj",
-            heroSubtitle: "Experience unparalleled luxury and hospitality in Taj Nagri, Agra, Uttar Pradesh.",
-            restaurantTitle: "MTJ LONDON DARBAR",
-            restaurantDescription: "Discover a curated fusion of world cuisine at MTJ London Darbar, where local flavors meet international flair in a magnificent setting.",
-            addressLine1: "MIG 1 & 2, Shilpgram Road, Taj Nagri, Phase 1,",
-            addressLine2: "Taj East Gate, MIG Colony, Agra, Uttar Pradesh 282006",
-            contactPhone: "+91 86076 86409",
-            contactEmail: "reservations@mtjhotels.com",
+    body { font-family: Segoe UI, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif; color: #333; }
+    .navbar { padding: 0.75rem 0; }
+    .navbar .navbar-brand { font-weight: 700; letter-spacing: 0.5px; }
+    .navbar .btn-book { background: var(--brand-primary); color: #fff; }
+    .navbar .btn-book:hover { background: #74552f; color: #fff; }
 
-            // Media URL Defaults (Themed Placeholders)
-            logoUrl: 'https://placehold.co/150x40/1f2937/d97706?text=MTJ+HOTELS',
-            heroBackgroundUrl: 'https://placehold.co/1400x700/1f2937/e5e7eb?text=MTJ+Hotels+Agra+Facade',
-            restaurantImage: 'https://placehold.co/700x500/1f2937/d97706?text=MTJ+London+Darbar+Interior',
-            
-            // Room Images (6 Types)
-            roomImage0: 'https://placehold.co/600x400/1f2937/d97706?text=Family+Quad+Room',
-            roomImage1: 'https://placehold.co/600x400/293a4c/d97706?text=Family+Triple+Room',
-            roomImage2: 'https://placehold.co/600x400/4f46e5/d97706?text=Deluxe+Twin+Beds',
-            roomImage3: 'https://placehold.co/600x400/374151/d97706?text=Standard+Room',
-            roomImage4: 'https://placehold.co/600x400/546e7a/d97706?text=Deluxe+Room+Luxury',
-            roomImage5: 'https://placehold.co/600x400/8d6e63/d97706?text=Female+Dormitory',
-        };
-        
-        // --- Utility Functions ---
+    /* Hero */
+    .hero {
+      min-height: 70vh;
+      background: url('images/hero.jpg') center/cover no-repeat;
+      position: relative;
+      color: #fff;
+      display: flex;
+      align-items: center;
+    }
+    .hero::after {
+      content: "";
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.35));
+    }
+    .hero .hero-content {
+      position: relative;
+      z-index: 2;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 2rem;
+      text-align: center;
+    }
+    .hero h1 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; }
+    .hero p.lead { font-size: clamp(1rem, 2.5vw, 1.25rem); opacity: 0.9; }
+    .btn-primary { background: var(--brand-primary); border-color: var(--brand-primary); }
+    .btn-primary:hover { background: #74552f; border-color: #74552f; }
 
-        // Status Message Utility (Replaces alert())
-        function showMessage(message, type = 'success') {
-            const statusEl = document.getElementById('status-message');
-            statusEl.textContent = message;
-            statusEl.className = 'fixed top-20 right-4 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 z-[60]';
+    /* Sections */
+    .section-title {
+      text-align: center;
+      margin-bottom: 1.25rem;
+      font-weight: 700;
+    }
+    .section-subtitle {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 2rem;
+      color: #666;
+    }
+    .section-pad { padding: 60px 0; }
 
-            if (type === 'success') {
-                statusEl.classList.add('bg-green-500');
-            } else if (type === 'error') {
-                statusEl.classList.add('bg-red-500');
-            } else {
-                statusEl.classList.add('bg-blue-500');
-            }
+    /* Cards & gallery */
+    .room-card img, .gallery img { height: 220px; object-fit: cover; }
+    .room-card .card-title { font-weight: 700; }
+    .gallery img { border-radius: 8px; }
 
-            statusEl.classList.remove('opacity-0');
-            setTimeout(() => {
-                statusEl.classList.add('opacity-0');
-            }, 3000);
-        }
+    /* Restaurant carousel */
+    #restaurantCarousel .carousel-item img { height: 420px; object-fit: cover; }
 
-        // 1. Firebase Initialization and Authentication
-        async function initFirebase() {
-            try {
-                // setLogLevel('debug');
-                
-                // CRITICAL CHECK: Ensure configuration is valid before proceeding
-                if (!firebaseConfig || Object.keys(firebaseConfig).length === 0) {
-                     throw new Error("Firebase configuration object is empty or invalid.");
-                }
+    /* Map */
+    .map-wrap { border-radius: 12px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
 
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-                storage = getStorage(app); // Initialize Storage
-                
-                // Sign in using the custom token if available, otherwise anonymously
-                if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(auth);
-                }
+    /* Footer */
+    footer { background: var(--brand-dark); color: #ddd; padding: 30px 0; }
+    footer a { color: #ddd; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
 
-                onAuthStateChanged(auth, (user) => {
-                    if (user) {
-                        userId = user.uid;
-                        isAuthReady = true;
-                        console.log("Firebase Auth Ready. User ID:", userId);
-                        loadContent();
-                    } else {
-                        userId = null;
-                        isAuthReady = true;
-                        console.log("Firebase Auth Ready. Signed in Anonymously.");
-                        loadContent(); 
-                    }
-                });
-
-            } catch (error) {
-                console.error("CRITICAL: Firebase Initialization Error:", error);
-                showMessage("Database connection failed. Content cannot be saved.", 'error');
-                isAuthReady = false; // Ensure saving is blocked if critical services fail
-            }
-        }
-        
-        // Helper to update media elements (img src or section background style)
-        function updateMedia(element, url) {
-            if (element.tagName === 'IMG') {
-                element.src = url;
-            } else if (element.tagName === 'SECTION') {
-                element.style.backgroundImage = `url('${url}')`;
-            }
-        }
-
-        // 2. Load Content from Firestore
-        async function loadContent() {
-            if (!isAuthReady || !db || !userId) return;
-
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', DB_COLLECTION_NAME, DB_DOCUMENT_ID);
-                const docSnap = await getDoc(docRef);
-                const data = docSnap.exists() ? docSnap.data() : {};
-                    
-                // Helper to load text/contenteditable fields
-                function loadText(id, field, defaultVal) {
-                    const el = document.getElementById(id);
-                    if (el) el.textContent = data[field] || defaultVal;
-                }
-
-                // Helper to load media URLs
-                function loadMedia(id, field, defaultVal) {
-                    const el = document.getElementById(id);
-                    const url = data[field] || defaultVal;
-                    if (el) updateMedia(el, url);
-                }
-                
-                // --- Apply Content Updates (Media and Text) ---
-
-                // Logo/Hero/Contact Text Fields
-                loadMedia('hotel-logo', 'logoUrl', defaultContent.logoUrl);
-                loadText('hero-title', 'heroTitle', defaultContent.heroTitle);
-                loadText('hero-subtitle', 'heroSubtitle', defaultContent.heroSubtitle);
-                loadMedia('hero-section', 'heroBackgroundUrl', defaultContent.heroBackgroundUrl);
-                loadText('address-line1', 'addressLine1', defaultContent.addressLine1);
-                loadText('address-line2', 'addressLine2', defaultContent.addressLine2);
-                loadText('contact-phone', 'contactPhone', defaultContent.contactPhone);
-                loadText('contact-email', 'contactEmail', defaultContent.contactEmail);
-                
-                // Dining Section
-                loadText('restaurant-title', 'restaurantTitle', defaultContent.restaurantTitle);
-                loadText('restaurant-description', 'restaurantDescription', defaultContent.restaurantDescription);
-                loadMedia('restaurant-image-el', 'restaurantImage', defaultContent.restaurantImage);
-
-
-                // Rooms Section
-                const roomCards = document.querySelectorAll('#rooms-container > div[data-room-index]');
-                data.rooms = Array.isArray(data.rooms) ? data.rooms : [];
-
-                // Default room configuration for all 6 types
-                const defaultRoomConfigs = [
-                    { name: "Family Deluxe Quad Room", desc: "Spacious room accommodating four adults, perfect for family travel.", price: "Inquire for Price" },
-                    { name: "Family Deluxe Triple Room", desc: "Comfortable and roomy lodging for three adults, ideal for friend groups.", price: "Inquire for Price" },
-                    { name: "Deluxe Twin Room", desc: "Two large separate beds in a finely appointed room for shared trips.", price: "Inquire for Price" },
-                    { name: "Standard Room (4 Units)", desc: "The perfect balance of comfort and value for short or long stays.", price: "Inquire for Price" },
-                    { name: "Deluxe Room (4 Units)", desc: "Elevated comfort with premium amenities and enhanced views.", price: "Inquire for Price" },
-                    { name: "Female Dormitory (18 Beds)", desc: "Secure and dedicated bunk bed accommodation for female solo travelers or groups.", price: "Inquire for Price" },
-                ];
-                
-                roomCards.forEach((card, index) => {
-                    const defaultRoom = defaultRoomConfigs[index];
-                    const roomData = data.rooms[index];
-
-                    const roomNameEl = card.querySelector('[data-field="roomName"]');
-                    const roomDescEl = card.querySelector('[data-field="roomDescription"]');
-                    const roomPriceEl = card.querySelector('[data-field="roomPrice"]');
-                    const roomImgEl = card.querySelector('img');
-
-                    if (roomData) {
-                        roomNameEl.textContent = roomData.name || defaultRoom.name;
-                        roomDescEl.textContent = roomData.description || defaultRoom.desc;
-                        roomPriceEl.textContent = roomData.price || defaultRoom.price;
-                    } else {
-                        roomNameEl.textContent = defaultRoom.name;
-                        roomDescEl.textContent = defaultRoom.desc;
-                        roomPriceEl.textContent = defaultRoom.price;
-                    }
-                    
-                    // Update room image
-                    loadMedia(roomImgEl.id, `roomImage${index}`, defaultContent[`roomImage${index}`]);
-                });
-
-            } catch (error) {
-                console.error("Error loading content:", error);
-                showMessage("Failed to load content from database.", 'error');
-            }
-        }
-        
-        // 3. Upload File to Storage and Update Firestore URL
-        async function uploadFileAndSaveURL(fileInput, fieldName, targetElementId, loadingElementId) {
-            if (!adminMode || !isAuthReady || !storage || !db || !userId) {
-                showMessage("Cannot upload. Admin mode or database connection not ready.", 'error');
-                return;
-            }
-
-            const file = fileInput.files[0];
-            if (!file) return;
-
-            const loadingEl = document.getElementById(loadingElementId);
-            const targetEl = document.getElementById(targetElementId);
-            
-            // Show loading state
-            loadingEl.textContent = 'Uploading...';
-            loadingEl.classList.remove('hidden');
-            loadingEl.parentElement.querySelector('button').disabled = true;
-
-            try {
-                // Storage path: artifacts/{appId}/media/{userId}/{fileName}_{timestamp}
-                const storageRef = ref(storage, `artifacts/${appId}/media/${userId}/${fieldName}_${Date.now()}_${file.name}`);
-                
-                // Upload file
-                const snapshot = await uploadBytes(storageRef, file);
-                
-                // Get public download URL
-                const downloadURL = await getDownloadURL(snapshot.ref);
-
-                // Update Firestore with the new URL
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', DB_COLLECTION_NAME, DB_DOCUMENT_ID);
-                await setDoc(docRef, { [fieldName]: downloadURL }, { merge: true });
-
-                // Update UI instantly
-                updateMedia(targetEl, downloadURL);
-                showMessage(`${fieldName.replace('Url', ' Image')} uploaded and saved!`, 'success');
-
-            } catch (error) {
-                console.error(`Error uploading ${fieldName}:`, error);
-                showMessage(`Upload failed for ${fieldName}. See console.`, 'error');
-            } finally {
-                // Cleanup
-                loadingEl.classList.add('hidden');
-                loadingEl.parentElement.querySelector('button').disabled = false;
-                fileInput.value = ''; // Clear file input so same file can be uploaded again
-            }
-        }
-
-
-        // 4. Save Text Content to Firestore (Media is saved immediately upon upload)
-        async function saveContent() {
-            if (!isAuthReady || !db || !userId || !adminMode) {
-                showMessage("Admin mode is not active or authentication is incomplete.", 'error');
-                return;
-            }
-
-            try {
-                // Collect Text Content
-                const heroTitle = document.getElementById('hero-title').textContent.trim();
-                const heroSubtitle = document.getElementById('hero-subtitle').textContent.trim();
-                const restaurantTitle = document.getElementById('restaurant-title').textContent.trim();
-                const restaurantDescription = document.getElementById('restaurant-description').textContent.trim();
-                const addressLine1 = document.getElementById('address-line1').textContent.trim();
-                const addressLine2 = document.getElementById('address-line2').textContent.trim();
-                const contactPhone = document.getElementById('contact-phone').textContent.trim();
-                const contactEmail = document.getElementById('contact-email').textContent.trim();
-
-
-                // Collect Room Text Content
-                const rooms = [];
-                document.querySelectorAll('#rooms-container > div[data-room-index]').forEach(card => {
-                    rooms.push({
-                        name: card.querySelector('[data-field="roomName"]').textContent.trim(),
-                        description: card.querySelector('[data-field="roomDescription"]').textContent.trim(),
-                        price: card.querySelector('[data-field="roomPrice"]').textContent.trim()
-                    });
-                });
-
-                const payload = {
-                    heroTitle,
-                    heroSubtitle,
-                    restaurantTitle,
-                    restaurantDescription,
-                    addressLine1,
-                    addressLine2,
-                    contactPhone,
-                    contactEmail,
-                    rooms
-                };
-                
-                // Public data path: /artifacts/{appId}/public/data/{collection}/{docId}
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', DB_COLLECTION_NAME, DB_DOCUMENT_ID);
-                await setDoc(docRef, payload, { merge: true });
-
-                showMessage("Text content saved successfully!", 'success');
-            } catch (error) {
-                console.error("Error saving content:", error);
-                showMessage("Error saving content. See console for details.", 'error');
-            }
-        }
-
-        // 5. Admin Mode Management
-        function applyContentEditable(isEditable) {
-            document.querySelectorAll('[data-field]').forEach(el => {
-                // Toggle text editability
-                el.setAttribute('contenteditable', isEditable ? 'true' : 'false');
-            });
-            
-            // Toggle visibility of media upload sections
-            document.querySelectorAll('.admin-media-upload').forEach(section => {
-                section.classList.toggle('hidden', !isEditable);
-            });
-
-            document.body.classList.toggle('admin-mode-active', isEditable);
-        }
-        
-        // Hardcoded password for client-side Admin Mode toggle
-        const ADMIN_PASSWORD = "admin123";
-
-        function toggleAdminMode() {
-            if (!isAuthReady) {
-                 showMessage("Please wait, connecting to database...", 'info');
-                 return;
-            }
-            if (adminMode) {
-                adminMode = false;
-                applyContentEditable(false);
-                document.getElementById('admin-bar').classList.add('hidden');
-                document.getElementById('admin-mode-status').textContent = 'OFF';
-                document.getElementById('admin-mode-status').classList.replace('text-green-400', 'text-red-400');
-                showMessage("Admin Mode turned OFF.", 'info');
-
-            } else {
-                const password = prompt("Enter Admin Password:");
-                if (password === ADMIN_PASSWORD) {
-                    adminMode = true;
-                    applyContentEditable(true);
-                    document.getElementById('admin-bar').classList.remove('hidden');
-                    document.getElementById('admin-mode-status').textContent = 'ON';
-                    document.getElementById('admin-mode-status').classList.replace('text-red-400', 'text-green-400');
-                    showMessage("Admin Mode activated. Media updates happen instantly.", 'info');
-                } else if (password !== null) {
-                    showMessage("Incorrect Password.", 'error');
-                }
-            }
-        }
-        
-        window.onload = initFirebase;
-        window.saveContent = saveContent;
-        window.toggleAdminMode = toggleAdminMode;
-        window.uploadFileAndSaveURL = uploadFileAndSaveURL; // Expose to global scope for file inputs
-
-    </script>
-
-    <!-- Use Inter font family and Custom Styles -->
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f9fafb; /* Soft light background */
-        }
-        /* Color variables for consistent luxury feel */
-        .color-primary-dark { color: #1f2937; }
-        .color-accent { color: #d97706; } /* Gold/Amber */
-        .bg-primary-dark { background-color: #1f2937; }
-        .border-accent { border-color: #d97706; }
-
-        /* Base styles for editable elements */
-        [data-field] {
-             cursor: default;
-             user-select: text;
-             transition: all 0.2s;
-        }
-
-        /* Styles specifically applied when contenteditable="true" */
-        [contenteditable="true"] {
-            outline: 3px solid #d97706; 
-            outline-offset: 4px;
-            background-color: #fef3c7; /* Pale yellow background when editing */
-            border-radius: 4px;
-            padding: 2px;
-            cursor: text;
-        }
-    </style>
+    /* Language switcher */
+    .language-switch { position: fixed; right: 16px; bottom: 16px; z-index: 10; }
+    .badge-brand { background: var(--brand-primary); }
+  </style>
 </head>
-<body class="antialiased text-gray-800">
+<body>
 
-    <!-- Header & Navigation -->
-    <header class="sticky top-0 z-50 bg-white shadow-lg">
-        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-            <!-- Logo Area (Editable Media) -->
-            <div class="flex items-center space-x-4">
-                <img id="hotel-logo" src="https://placehold.co/150x40/1f2937/d97706?text=MTJ+HOTELS" alt="MTJ Hotels Logo" class="h-10 w-auto">
-                
-                <!-- Logo Upload UI -->
-                <div class="admin-media-upload hidden flex items-center space-x-2">
-                    <button onclick="document.getElementById('file-input-logo').click()" class="bg-blue-600 text-white px-2 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
-                        Upload Logo
-                    </button>
-                    <input type="file" id="file-input-logo" accept="image/*" onchange="uploadFileAndSaveURL(this, 'logoUrl', 'hotel-logo', 'logo-loading')" class="hidden">
-                    <span id="logo-loading" class="text-xs color-accent hidden"></span>
-                </div>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg bg-light shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="#home">MTJ Hotel Agra</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div id="navMenu" class="collapse navbar-collapse">
+        <ul class="navbar-nav ms-auto align-items-lg-center">
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#rooms">Rooms</a></li>
+          <li class="nav-item"><a class="nav-link" href="#restaurant">Restaurant</a></li>
+          <li class="nav-item"><a class="nav-link" href="#gallery">Gallery</a></li>
+          <li class="nav-item"><a class="nav-link" href="#map">Location</a></li>
+          <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+          <li class="nav-item ms-lg-2">
+            <a class="btn btn-book btn-sm" href="#booking"><i class="bi bi-calendar-check"></i> Book now</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header id="home" class="hero">
+    <div class="container hero-content" data-aos="fade-up">
+      <span class="badge badge-brand text-bg" style="background:var(--brand-primary)">Steps away from the Taj Mahal</span>
+      <h1 id="heroTitle">Boutique stays with heart</h1>
+      <p id="heroTagline" class="lead">Affordable, clean, and vibrant accommodations near the Taj East Gate, Tajganj, Agra.</p>
+      <div class="mt-3">
+        <a href="#booking" class="btn btn-primary btn-lg me-2">Check availability</a>
+        <a href="#rooms" class="btn btn-outline-light btn-lg">Explore rooms</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- About -->
+  <section id="about" class="section-pad">
+    <div class="container">
+      <h2 class="section-title" data-aos="fade-up">Welcome to MTJ Hotel Agra</h2>
+      <p id="aboutText" class="section-subtitle" data-aos="fade-up" data-aos-delay="100">
+        MTJ Hotel Agra is a boutique backpackers hostel near the Taj Mahal’s East Gate. Enjoy friendly hospitality,
+        thoughtful amenities, and easy access to Agra’s landmarks.
+      </p>
+      <div class="row g-4 mt-2">
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="150">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title"><i class="bi bi-wifi me-2"></i>Free Wi‑Fi</h5>
+              <p class="card-text">High-speed internet throughout the property for work and leisure.</p>
             </div>
-
-            <!-- Desktop Nav Links and Admin Controls -->
-            <div class="flex items-center space-x-6">
-                <div class="hidden md:flex space-x-8 text-lg">
-                    <a href="#rooms" class="text-gray-600 hover:color-accent transition duration-300">Rooms</a>
-                    <a href="#dining" class="text-gray-600 hover:color-accent transition duration-300">Dining</a>
-                    <a href="#contact" class="text-gray-600 hover:color-accent transition duration-300">Contact</a>
-                </div>
-                
-                <!-- Admin Mode Toggle Button -->
-                <button id="admin-toggle-btn" class="px-3 py-1 text-sm text-white bg-primary-dark rounded-lg hover:bg-gray-700 transition duration-300 shadow-md flex items-center" onclick="toggleAdminMode()">
-                    Admin Mode: <span id="admin-mode-status" class="ml-2 font-bold text-red-400">OFF</span>
-                </button>
-
-                <!-- Booking Button (Always visible) -->
-                <button class="hidden sm:inline-block px-6 py-2 text-white bg-color-accent rounded-full font-semibold hover:bg-yellow-700 transition duration-300 shadow-xl">
-                    Book Your Stay
-                </button>
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <!-- Admin Save Bar (Only visible in Admin Mode) -->
-        <div id="admin-bar" class="hidden fixed bottom-0 left-0 w-full p-4 bg-primary-dark text-white z-50 shadow-2xl border-t-4 border-color-accent">
-            <div class="max-w-7xl mx-auto flex justify-between items-center flex-col sm:flex-row space-y-2 sm:space-y-0">
-                <p class="text-lg font-semibold text-amber-300">Text Content Editing Active (Password: admin123)</p>
-                <button id="save-content-btn" class="w-full sm:w-auto bg-green-500 text-white font-bold py-2 px-6 rounded-lg hover:bg-green-600 transition duration-300 shadow-lg" onclick="saveContent()">
-                    Save All Text Changes
-                </button>
-            </div>
+          </div>
         </div>
-        
-        <!-- Error/Status Message Box -->
-        <div id="status-message" class="fixed top-20 right-4 p-4 rounded-lg shadow-xl text-white transition-opacity duration-300 opacity-0 z-[60]"></div>
-
-
-        <!-- Hero Section (Editable Background) -->
-        <section id="hero-section" class="relative h-[650px] md:h-[800px] flex items-center justify-center text-white" style="background-image: url('https://placehold.co/1400x700/1f2937/e5e7eb?text=MTJ+Hotels+Agra+Facade'); background-size: cover; background-position: center;">
-            <div class="absolute inset-0 bg-primary-dark opacity-60"></div>
-            <div class="relative z-10 text-center max-w-5xl px-4">
-                <p class="text-lg font-medium color-accent mb-4 uppercase tracking-widest">MTJ HOTELS</p>
-                <h1 id="hero-title" data-field="heroTitle" class="text-6xl sm:text-7xl font-extralight mb-6 leading-tight">
-                    MTJ Hotels - Your Gateway to the Taj
-                </h1>
-                <p id="hero-subtitle" data-field="heroSubtitle" class="text-xl sm:text-2xl font-light mb-12 mx-auto max-w-3xl opacity-90">
-                    Experience unparalleled luxury and hospitality in Taj Nagri, Agra, Uttar Pradesh.
-                </p>
-                <button class="bg-color-accent text-primary-dark text-xl font-semibold px-12 py-4 rounded-xl shadow-2xl hover:bg-yellow-700 transition duration-300 transform hover:scale-105 uppercase tracking-wider">
-                    Reserve Your Stay
-                </button>
-
-                <!-- Hero Background Upload UI -->
-                <div class="admin-media-upload hidden mt-10 flex justify-center items-center">
-                    <button onclick="document.getElementById('file-input-hero').click()" class="bg-indigo-500 text-white px-4 py-2 text-sm rounded-lg hover:bg-indigo-600 transition">
-                        Upload Hero Background
-                    </button>
-                    <input type="file" id="file-input-hero" accept="image/*" onchange="uploadFileAndSaveURL(this, 'heroBackgroundUrl', 'hero-section', 'hero-loading')" class="hidden">
-                    <span id="hero-loading" class="ml-4 text-sm color-accent hidden"></span>
-                </div>
-
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="250">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title"><i class="bi bi-geo-alt me-2"></i>Prime location</h5>
+              <p class="card-text">Minutes from Taj Mahal East Gate, with easy transport and local dining.</p>
             </div>
-        </section>
-
-        <!-- Rooms Section -->
-        <section id="rooms" class="py-24 sm:py-32 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <p class="text-lg text-center color-accent mb-2 uppercase tracking-widest">Accommodations</p>
-                <h2 class="text-4xl font-light color-primary-dark text-center mb-16 uppercase tracking-wider">
-                    Luxury Rooms & Dormitory
-                </h2>
-                
-                <div id="rooms-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12">
-                    
-                    <!-- Room Card 1 (Family Deluxe Quad) -->
-                    <div data-room-index="0" class="bg-white rounded-xl shadow-3xl overflow-hidden border-t-8 border-color-accent transition duration-500 hover:shadow-4xl hover:-translate-y-1">
-                        <img id="room-img-0" src="https://placehold.co/600x400/1f2937/d97706?text=MTJ+Family+Quad+Room" alt="Family Deluxe Quad Room" class="w-full h-56 object-cover">
-                        <!-- Room 1 Image Upload UI -->
-                        <div class="admin-media-upload hidden p-4 flex justify-center">
-                            <button onclick="document.getElementById('file-input-room0').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
-                                Upload Room Photo
-                            </button>
-                            <input type="file" id="file-input-room0" accept="image/*" onchange="uploadFileAndSaveURL(this, 'roomImage0', 'room-img-0', 'room0-loading')" class="hidden">
-                            <span id="room0-loading" class="ml-2 text-xs color-accent hidden"></span>
-                        </div>
-                        <div class="p-8">
-                            <h3 data-field="roomName" class="text-2xl font-light color-primary-dark mb-3 uppercase">Family Deluxe Quad Room</h3>
-                            <p data-field="roomDescription" class="text-gray-600 mb-5">Our most spacious family suite, comfortably accommodating up to four adults with premium bedding and a dedicated lounge area.</p>
-                            <div class="flex justify-between items-center mt-4 border-t pt-4">
-                                <span data-field="roomPrice" class="text-2xl font-bold color-accent">Inquire for Price</span>
-                                <a href="#" class="text-sm font-medium color-primary-dark hover:color-accent transition duration-300">VIEW DETAILS &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Room Card 2 (Family Deluxe Triple) -->
-                    <div data-room-index="1" class="bg-white rounded-xl shadow-3xl overflow-hidden border-t-8 border-color-accent transition duration-500 hover:shadow-4xl hover:-translate-y-1">
-                        <img id="room-img-1" src="https://placehold.co/600x400/293a4c/d97706?text=MTJ+Family+Triple+Room" alt="Family Deluxe Triple Room" class="w-full h-56 object-cover">
-                        <!-- Room 2 Image Upload UI -->
-                        <div class="admin-media-upload hidden p-4 flex justify-center">
-                            <button onclick="document.getElementById('file-input-room1').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
-                                Upload Room Photo
-                            </button>
-                            <input type="file" id="file-input-room1" accept="image/*" onchange="uploadFileAndSaveURL(this, 'roomImage1', 'room-img-1', 'room1-loading')" class="hidden">
-                            <span id="room1-loading" class="ml-2 text-xs color-accent hidden"></span>
-                        </div>
-                        <div class="p-8">
-                            <h3 data-field="roomName" class="text-2xl font-light color-primary-dark mb-3 uppercase">Family Deluxe Triple Room</h3>
-                            <p data-field="roomDescription" class="text-gray-600 mb-5">A well-designed room ideal for family or friend groups of three, ensuring a comfortable and relaxing stay.</p>
-                            <div class="flex justify-between items-center mt-4 border-t pt-4">
-                                <span data-field="roomPrice" class="text-2xl font-bold color-accent">Inquire for Price</span>
-                                <a href="#" class="text-sm font-medium color-primary-dark hover:color-accent transition duration-300">VIEW DETAILS &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Room Card 3 (Deluxe Twin) -->
-                    <div data-room-index="2" class="bg-white rounded-xl shadow-3xl overflow-hidden border-t-8 border-color-accent transition duration-500 hover:shadow-4xl hover:-translate-y-1">
-                        <img id="room-img-2" src="https://placehold.co/600x400/4f46e5/d97706?text=MTJ+Deluxe+Twin+Beds" alt="Deluxe Twin Room" class="w-full h-56 object-cover">
-                        <!-- Room 3 Image Upload UI -->
-                        <div class="admin-media-upload hidden p-4 flex justify-center">
-                            <button onclick="document.getElementById('file-input-room2').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
-                                Upload Room Photo
-                            </button>
-                            <input type="file" id="file-input-room2" accept="image/*" onchange="uploadFileAndSaveURL(this, 'roomImage2', 'room-img-2', 'room2-loading')" class="hidden">
-                            <span id="room2-loading" class="ml-2 text-xs color-accent hidden"></span>
-                        </div>
-                        <div class="p-8">
-                            <h3 data-field="roomName" class="text-2xl font-light color-primary-dark mb-3 uppercase">Deluxe Twin Room</h3>
-                            <p data-field="roomDescription" class="text-gray-600 mb-5">A spacious option featuring two separate single beds, perfect for shared trips without compromising comfort.</p>
-                            <div class="flex justify-between items-center mt-4 border-t pt-4">
-                                <span data-field="roomPrice" class="text-2xl font-bold color-accent">Inquire for Price</span>
-                                <a href="#" class="text-sm font-medium color-primary-dark hover:color-accent transition duration-300">VIEW DETAILS &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Room Card 4 (Standard Room) -->
-                    <div data-room-index="3" class="bg-white rounded-xl shadow-3xl overflow-hidden border-t-8 border-color-accent transition duration-500 hover:shadow-4xl hover:-translate-y-1">
-                        <img id="room-img-3" src="https://placehold.co/600x400/374151/d97706?text=Standard+Room" alt="Standard Room" class="w-full h-56 object-cover">
-                        <!-- Room 4 Image Upload UI -->
-                        <div class="admin-media-upload hidden p-4 flex justify-center">
-                            <button onclick="document.getElementById('file-input-room3').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
-                                Upload Room Photo
-                            </button>
-                            <input type="file" id="file-input-room3" accept="image/*" onchange="uploadFileAndSaveURL(this, 'roomImage3', 'room-img-3', 'room3-loading')" class="hidden">
-                            <span id="room3-loading" class="ml-2 text-xs color-accent hidden"></span>
-                        </div>
-                        <div class="p-8">
-                            <h3 data-field="roomName" class="text-2xl font-light color-primary-dark mb-3 uppercase">Standard Room (4 Units)</h3>
-                            <p data-field="roomDescription" class="text-gray-600 mb-5">Our comfortable and efficient rooms offering the best value for solo and couple travelers.</p>
-                            <div class="flex justify-between items-center mt-4 border-t pt-4">
-                                <span data-field="roomPrice" class="text-2xl font-bold color-accent">Inquire for Price</span>
-                                <a href="#" class="text-sm font-medium color-primary-dark hover:color-accent transition duration-300">VIEW DETAILS &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Room Card 5 (Deluxe Room) -->
-                    <div data-room-index="4" class="bg-white rounded-xl shadow-3xl overflow-hidden border-t-8 border-color-accent transition duration-500 hover:shadow-4xl hover:-translate-y-1">
-                        <img id="room-img-4" src="https://placehold.co/600x400/546e7a/d97706?text=Deluxe+Room+Luxury" alt="Deluxe Room" class="w-full h-56 object-cover">
-                        <!-- Room 5 Image Upload UI -->
-                        <div class="admin-media-upload hidden p-4 flex justify-center">
-                            <button onclick="document.getElementById('file-input-room4').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
-                                Upload Room Photo
-                            </button>
-                            <input type="file" id="file-input-room4" accept="image/*" onchange="uploadFileAndSaveURL(this, 'roomImage4', 'room-img-4', 'room4-loading')" class="hidden">
-                            <span id="room4-loading" class="ml-2 text-xs color-accent hidden"></span>
-                        </div>
-                        <div class="p-8">
-                            <h3 data-field="roomName" class="text-2xl font-light color-primary-dark mb-3 uppercase">Deluxe Room (4 Units)</h3>
-                            <p data-field="roomDescription" class="text-gray-600 mb-5">Enjoy enhanced space, premium linen, and dedicated workspace for a superior stay.</p>
-                            <div class="flex justify-between items-center mt-4 border-t pt-4">
-                                <span data-field="roomPrice" class="text-2xl font-bold color-accent">Inquire for Price</span>
-                                <a href="#" class="text-sm font-medium color-primary-dark hover:color-accent transition duration-300">VIEW DETAILS &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Room Card 6 (Female Dormitory) -->
-                    <div data-room-index="5" class="bg-white rounded-xl shadow-3xl overflow-hidden border-t-8 border-color-accent transition duration-500 hover:shadow-4xl hover:-translate-y-1">
-                        <img id="room-img-5" src="https://placehold.co/600x400/8d6e63/d97706?text=Female+Dormitory" alt="Female Dormitory" class="w-full h-56 object-cover">
-                        <!-- Room 6 Image Upload UI -->
-                        <div class="admin-media-upload hidden p-4 flex justify-center">
-                            <button onclick="document.getElementById('file-input-room5').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
-                                Upload Room Photo
-                            </button>
-                            <input type="file" id="file-input-room5" accept="image/*" onchange="uploadFileAndSaveURL(this, 'roomImage5', 'room-img-5', 'room5-loading')" class="hidden">
-                            <span id="room5-loading" class="ml-2 text-xs color-accent hidden"></span>
-                        </div>
-                        <div class="p-8">
-                            <h3 data-field="roomName" class="text-2xl font-light color-primary-dark mb-3 uppercase">Female Dormitory (18 Beds)</h3>
-                            <p data-field="roomDescription" class="text-gray-600 mb-5">Safe and secure bunk bed accommodation dedicated exclusively to female travelers, with individual lockers.</p>
-                            <div class="flex justify-between items-center mt-4 border-t pt-4">
-                                <span data-field="roomPrice" class="text-2xl font-bold color-accent">Inquire for Price</span>
-                                <a href="#" class="text-sm font-medium color-primary-dark hover:color-accent transition duration-300">VIEW DETAILS &rarr;</a>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
+          </div>
+        </div>
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="350">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title"><i class="bi bi-shield-check me-2"></i>Clean & safe</h5>
+              <p class="card-text">Well-maintained rooms, reliable housekeeping, and safety-first standards.</p>
             </div>
-        </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <!-- Dining Section (Editable) -->
-        <section id="dining" class="py-24 sm:py-32 bg-primary-dark text-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="md:flex md:items-center md:justify-between gap-16">
-                    
-                    <!-- Image Placeholder (Editable Media) -->
-                    <div class="md:w-1/2 rounded-xl shadow-2xl overflow-hidden mb-10 md:mb-0">
-                        <img id="restaurant-image-el" src="https://placehold.co/700x500/1f2937/d97706?text=MTJ+London+Darbar+Interior" alt="Elegant restaurant interior" class="w-full h-full object-cover">
-                        <!-- Restaurant Image Upload UI -->
-                        <div class="admin-media-upload hidden p-4 flex justify-center -mt-4">
-                            <button onclick="document.getElementById('file-input-restaurant').click()" class="bg-blue-600 text-white px-3 py-1 text-xs rounded-lg hover:bg-blue-700 transition">
-                                Upload Restaurant Photo
-                            </button>
-                            <input type="file" id="file-input-restaurant" accept="image/*" onchange="uploadFileAndSaveURL(this, 'restaurantImage', 'restaurant-image-el', 'restaurant-loading')" class="hidden">
-                            <span id="restaurant-loading" class="ml-2 text-xs color-accent hidden"></span>
-                        </div>
-                    </div>
+  <!-- Rooms -->
+  <section id="rooms" class="section-pad bg-light">
+    <div class="container">
+      <h2 class="section-title" data-aos="fade-up">Our rooms</h2>
+      <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Choose from dormitory beds, family quads, and private rooms.</p>
 
-                    <!-- Text Content -->
-                    <div class="md:w-1/2">
-                        <p class="text-lg color-accent mb-2 uppercase tracking-widest">Signature Cuisine</p>
-                        <h2 id="restaurant-title" data-field="restaurantTitle" class="text-5xl font-light mb-6 leading-tight uppercase">
-                            MTJ LONDON DARBAR
-                        </h2>
-                        <p data-field="restaurantDescription" class="text-xl text-gray-300 leading-relaxed mb-6">
-                            Discover a curated fusion of world cuisine at MTJ London Darbar, where local flavors meet international flair in a magnificent setting.
-                        </p>
-                        <ul class="space-y-3 text-gray-300">
-                            <li class="flex items-center">
-                                <span class="color-accent mr-2 text-xl">&bull;</span> Seasonal, farm-to-table menus
-                            </li>
-                            <li class="flex items-center">
-                                <span class="color-accent mr-2 text-xl">&bull;</span> Extensive wine and beverage list
-                            </li>
-                            <li class="flex items-center">
-                                <span class="color-accent mr-2 text-xl">&bull;</span> Elegant private dining experience
-                            </li>
-                        </ul>
-                        <button class="mt-8 bg-color-accent text-primary-dark font-semibold px-8 py-3 rounded-lg hover:bg-yellow-700 transition duration-300 shadow-xl uppercase">
-                            View Menu & Reservations
-                        </button>
-                    </div>
-
-                </div>
+      <div class="row g-4 mt-2">
+        <!-- Dormitory -->
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="150">
+          <div class="card room-card h-100">
+            <img src="images/rooms/dorm_1.jpg" class="card-img-top" alt="Dormitory">
+            <div class="card-body">
+              <h5 class="card-title">Dormitory Beds</h5>
+              <p class="card-text">Budget-friendly shared rooms with bunk beds and secure lockers.</p>
+              <p class="mb-2"><strong>Amenities:</strong> Wi‑Fi, AC, Shared washrooms, Lockers</p>
+              <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalDorm">View gallery</button>
+                <a class="btn btn-primary btn-sm" href="#booking">Book</a>
+              </div>
             </div>
-        </section>
-
-
-        <!-- Contact Information Section -->
-        <section id="contact" class="py-20 sm:py-32 bg-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <p class="text-lg text-center color-accent mb-2 uppercase tracking-widest">Connect with Us</p>
-                <h2 class="text-4xl font-light color-primary-dark text-center mb-16 uppercase tracking-wider">
-                    Get in Touch
-                </h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-                    <!-- Address -->
-                    <div class="text-center p-8 bg-gray-50 rounded-xl shadow-xl border-t-4 border-color-accent">
-                        <div class="color-accent mb-4 mx-auto w-10 h-10">
-                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-semibold color-primary-dark mb-3">Location</h3>
-                        <p id="address-line1" data-field="addressLine1" class="text-gray-600 mb-1">MIG 1 & 2, Shilpgram Road, Taj Nagri, Phase 1,</p>
-                        <p id="address-line2" data-field="addressLine2" class="text-gray-600">Taj East Gate, MIG Colony, Agra, Uttar Pradesh 282006</p>
-                    </div>
-
-                    <!-- Phone -->
-                    <div class="text-center p-8 bg-gray-50 rounded-xl shadow-xl border-t-4 border-color-accent">
-                        <div class="color-accent mb-4 mx-auto w-10 h-10">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.151c-.161.082-.32.175-.47.276a1.004 1.004 0 00-.083 1.125l.89 1.484a1 1 0 00.9.544h4.167a1 1 0 00.9-.544l.89-1.484a1.004 1.004 0 00-.083-1.125c-.15-.101-.309-.194-.47-.276l-2.257-1.151a1 1 0 01-.502-1.21l1.498-4.493a1 1 0 01.948-.684H19a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-semibold color-primary-dark mb-3">Call Us</h3>
-                        <p id="contact-phone" data-field="contactPhone" class="text-gray-600 font-bold">+91 86076 86409</p>
-                        <p class="text-sm text-gray-500 mt-2">Available 24/7</p>
-                    </div>
-
-                    <!-- Email -->
-                    <div class="text-center p-8 bg-gray-50 rounded-xl shadow-xl border-t-4 border-color-accent">
-                        <div class="color-accent mb-4 mx-auto w-10 h-10">
-                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                            </svg>
-                        </div>
-                        <h3 class="text-xl font-semibold color-primary-dark mb-3">Email</h3>
-                        <p id="contact-email" data-field="contactEmail" class="text-gray-600 truncate">reservations@mtjhotels.com</p>
-                        <p class="text-sm text-gray-500 mt-2">Bookings & Inquiries</p>
-                    </div>
-                </div>
+          </div>
+        </div>
+        <!-- Family Quad -->
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="250">
+          <div class="card room-card h-100">
+            <img src="images/rooms/family_1.jpg" class="card-img-top" alt="Family Quadruple Room">
+            <div class="card-body">
+              <h5 class="card-title">Family Quadruple Room</h5>
+              <p class="card-text">Spacious room with bunks and double bed, perfect for groups or families.</p>
+              <p class="mb-2"><strong>Amenities:</strong> Wi‑Fi, AC, Ensuite, TV</p>
+              <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalFamily">View gallery</button>
+                <a class="btn btn-primary btn-sm" href="#booking">Book</a>
+              </div>
             </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="bg-primary-dark text-white py-12">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <p class="text-lg font-light color-accent mb-2">MTJ Hotels</p>
-                <p class="text-sm text-gray-400">&copy; <span id="current-year">2024</span> MTJ Hotels. All rights reserved.</p>
+          </div>
+        </div>
+        <!-- Private -->
+        <div class="col-md-4" data-aos="fade-up" data-aos-delay="350">
+          <div class="card room-card h-100">
+            <img src="images/rooms/private_1.jpg" class="card-img-top" alt="Private Room">
+            <div class="card-body">
+              <h5 class="card-title">Private Room</h5>
+              <p class="card-text">Comfortable non-smoking rooms with private bathrooms and modern comforts.</p>
+              <p class="mb-2"><strong>Amenities:</strong> Wi‑Fi, AC, Ensuite, TV, Desk</p>
+              <div class="d-flex gap-2">
+                <button class="btn btn-outline-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalPrivate">View gallery</button>
+                <a class="btn btn-primary btn-sm" href="#booking">Book</a>
+              </div>
             </div>
-        </footer>
-    </main>
+          </div>
+        </div>
+      </div>
+
+      <!-- Room Modals: multi-image galleries -->
+      <div class="modal fade" id="modalDorm" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Dormitory Beds</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+              <div class="row g-3 gallery">
+                <div class="col-md-4"><img src="images/rooms/dorm_1.jpg" class="img-fluid" alt=""></div>
+                <div class="col-md-4"><img src="images/rooms/dorm_2.jpg" class="img-fluid" alt=""></div>
+                <div class="col-md-4"><img src="images/rooms/dorm_3.jpg" class="img-fluid" alt=""></div>
+              </div>
+            </div>
+            <div class="modal-footer"><a class="btn btn-primary" href="#booking">Book now</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="modalFamily" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Family Quadruple Room</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+              <div class="row g-3 gallery">
+                <div class="col-md-4"><img src="images/rooms/family_1.jpg" class="img-fluid" alt=""></div>
+                <div class="col-md-4"><img src="images/rooms/family_2.jpg" class="img-fluid" alt=""></div>
+                <div class="col-md-4"><img src="images/rooms/family_3.jpg" class="img-fluid" alt=""></div>
+              </div>
+            </div>
+            <div class="modal-footer"><a class="btn btn-primary" href="#booking">Book now</a></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal fade" id="modalPrivate" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header"><h5 class="modal-title">Private Room</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+            <div class="modal-body">
+              <div class="row g-3 gallery">
+                <div class="col-md-4"><img src="images/rooms/private_1.jpg" class="img-fluid" alt=""></div>
+                <div class="col-md-4"><img src="images/rooms/private_2.jpg" class="img-fluid" alt=""></div>
+                <div class="col-md-4"><img src="images/rooms/private_3.jpg" class="img-fluid" alt=""></div>
+              </div>
+            </div>
+            <div class="modal-footer"><a class="btn btn-primary" href="#booking">Book now</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Restaurant -->
+  <section id="restaurant" class="section-pad">
+    <div class="container">
+      <h2 class="section-title" data-aos="fade-up">Restaurant</h2>
+      <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Enjoy local flavors and international favorites in a cozy setting.</p>
+
+      <div id="restaurantCarousel" class="carousel slide" data-bs-ride="carousel" data-aos="fade-up" data-aos-delay="150">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="images/restaurant/rest_1.jpg" class="d-block w-100" alt="Restaurant view">
+          </div>
+          <div class="carousel-item">
+            <img src="images/restaurant/rest_2.jpg" class="d-block w-100" alt="Dining setup">
+          </div>
+          <div class="carousel-item">
+            <img src="images/restaurant/rest_3.jpg" class="d-block w-100" alt="Cuisine">
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#restaurantCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#restaurantCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon"></span>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Photo Gallery -->
+  <section id="gallery" class="section-pad bg-light">
+    <div class="container">
+      <h2 class="section-title" data-aos="fade-up">Gallery</h2>
+      <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">A glimpse of our spaces and surroundings.</p>
+      <div class="row g-3 gallery mt-2" data-aos="fade-up" data-aos-delay="150">
+        <div class="col-md-3 col-6"><img src="images/gallery/g1.jpg" class="img-fluid" alt=""></div>
+        <div class="col-md-3 col-6"><img src="images/gallery/g2.jpg" class="img-fluid" alt=""></div>
+        <div class="col-md-3 col-6"><img src="images/gallery/g3.jpg" class="img-fluid" alt=""></div>
+        <div class="col-md-3 col-6"><img src="images/gallery/g4.jpg" class="img-fluid" alt=""></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Booking form -->
+  <section id="booking" class="section-pad">
+    <div class="container">
+      <h2 class="section-title" data-aos="fade-up">Book your stay</h2>
+      <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Check availability and send us your request. We’ll confirm shortly.</p>
+
+      <form class="row g-3" id="bookingForm" data-aos="fade-up" data-aos-delay="150">
+        <div class="col-md-3">
+          <label class="form-label">Check‑in</label>
+          <input type="date" class="form-control" id="checkin" required>
+        </div>
+        <div class="col-md-3">
+          <label class="form-label">Check‑out</label>
+          <input type="date" class="form-control" id="checkout" required>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label">Guests</label>
+          <input type="number" class="form-control" id="guests" min="1" value="2" required>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Room type</label>
+          <select class="form-select" id="roomtype" required>
+            <option value="Dormitory">Dormitory</option>
+            <option value="Family Quadruple">Family Quadruple</option>
+            <option value="Private Room">Private Room</option>
+          </select>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Your name</label>
+          <input type="text" class="form-control" id="fullname" placeholder="Full name" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" placeholder="you@example.com" required>
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Phone</label>
+          <input type="tel" class="form-control" id="phone" placeholder="+91" required>
+        </div>
+        <div class="col-12">
+          <label class="form-label">Notes (optional)</label>
+          <textarea class="form-control" id="notes" rows="3" placeholder="Special requests or arrival time"></textarea>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-primary btn-lg" type="submit"><i class="bi bi-send"></i> Submit request</button>
+          <small class="text-muted ms-2">This demo stores locally; connect to your backend to send emails or create bookings.</small>
+        </div>
+      </form>
+
+      <div id="bookingAlert" class="alert alert-success mt-3 d-none" role="alert">
+        Thank you! Your booking request was recorded locally for demo. Connect backend to send/confirm.
+      </div>
+    </div>
+  </section>
+
+  <!-- Location / Map -->
+  <section id="map" class="section-pad bg-light">
+    <div class="container">
+      <h2 class="section-title" data-aos="fade-up">Find us</h2>
+      <p class="section-subtitle" data-aos="fade-up" data-aos-delay="100">Phase 1, Taj East Gate, MIG Colony, Tajganj, Agra, Uttar Pradesh 282001</p>
+      <div class="map-wrap ratio ratio-16x9" data-aos="fade-up" data-aos-delay="150">
+        <!-- Replace src with your exact Google Maps Embed URL -->
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.457!2d78.042!3d27.175!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1sTaj%20Mahal!2sTaj%20Mahal!5e0!3m2!1sen!2sin!4v1700000000000"
+          style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section id="contact" class="section-pad">
+    <div class="container">
+      <h2 class="section-title" data-aos="fade-up">Contact us</h2>
+      <div class="row g-4 mt-2">
+        <div class="col-md-6" data-aos="fade-up" data-aos-delay="150">
+          <div class="card h-100">
+            <div class="card-body">
+              <p class="mb-1"><strong>Address:</strong> Taj East Gate, Tajganj, Agra, 282001</p>
+              <p class="mb-1"><strong>Email:</strong> info@mtjhotelagra.com</p>
+              <p class="mb-1"><strong>Phone:</strong> +91 98765 43210</p>
+              <p class="text-muted mb-0">Follow us: 
+                <a href="#" class="ms-1"><i class="bi bi-instagram"></i></a>
+                <a href="#" class="ms-2"><i class="bi bi-facebook"></i></a>
+                <a href="#" class="ms-2"><i class="bi bi-twitter-x"></i></a>
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6" data-aos="fade-up" data-aos-delay="250">
+          <form id="contactForm">
+            <div class="mb-3">
+              <label class="form-label">Name</label>
+              <input type="text" class="form-control" id="cname" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control" id="cemail" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Message</label>
+              <textarea class="form-control" id="cmsg" rows="3" required></textarea>
+            </div>
+            <button class="btn btn-primary" type="submit"><i class="bi bi-envelope"></i> Send</button>
+          </form>
+          <div id="contactAlert" class="alert alert-info mt-3 d-none" role="alert">
+            Thanks for reaching out! This demo stores locally; connect backend to send emails.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-center">
+        <p class="mb-2 mb-md-0">&copy; <span id="year"></span> MTJ Hotel Agra. All Rights Reserved.</p>
+        <div>
+          <a href="#home" class="me-3">Home</a>
+          <a href="#rooms" class="me-3">Rooms</a>
+          <a href="#restaurant" class="me-3">Restaurant</a>
+          <a href="#contact">Contact</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Floating language switch -->
+  <div class="language-switch">
+    <div class="btn-group shadow">
+      <button class="btn btn-outline-dark btn-sm" onclick="setLanguage('en')">English</button>
+      <button class="btn btn-outline-success btn-sm" onclick="setLanguage('hi')">हिंदी</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    AOS.init({ once: true });
+
+    // Year in footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Simple multilingual toggle (English/Hindi)
+    function setLanguage(lang) {
+      if (lang === 'hi') {
+        document.getElementById('heroTitle').innerText = 'दिल से की गई मेजबानी';
+        document.getElementById('heroTagline').innerText = 'ताज ईस्ट गेट के पास साफ-सुथरी और किफायती आवास सुविधा।';
+        document.getElementById('aboutText').innerText = 'एमटीजे होटल आगरा ताजमहल के ईस्ट गेट के पास स्थित एक बजट हॉस्टल है। दोस्ताना सेवा, सुविधाएँ और आसान पहुँच का आनंद लें।';
+      } else {
+        document.getElementById('heroTitle').innerText = 'Boutique stays with heart';
+        document.getElementById('heroTagline').innerText = 'Affordable, clean, and vibrant accommodations near the Taj East Gate, Tajganj, Agra.';
+        document.getElementById('aboutText').innerText = 'MTJ Hotel Agra is a boutique backpackers hostel near the Taj Mahal’s East Gate. Enjoy friendly hospitality, thoughtful amenities, and easy access to Agra’s landmarks.';
+      }
+    }
+
+    // Booking form demo (stores in localStorage for demo)
+    const bookingForm = document.getElementById('bookingForm');
+    const bookingAlert = document.getElementById('bookingAlert');
+    bookingForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const payload = {
+        checkin: document.getElementById('checkin').value,
+        checkout: document.getElementById('checkout').value,
+        guests: document.getElementById('guests').value,
+        roomtype: document.getElementById('roomtype').value,
+        fullname: document.getElementById('fullname').value,
+        email: document.getElementById('email').value,
+        phone: document.getElementById('phone').value,
+        notes: document.getElementById('notes').value
+      };
+      const records = JSON.parse(localStorage.getItem('mtjBookings') || '[]');
+      records.push(payload);
+      localStorage.setItem('mtjBookings', JSON.stringify(records));
+      bookingAlert.classList.remove('d-none');
+      bookingForm.reset();
+      setTimeout(() => bookingAlert.classList.add('d-none'), 5000);
+    });
+
+    // Contact form demo (stores in localStorage)
+    const contactForm = document.getElementById('contactForm');
+    const contactAlert = document.getElementById('contactAlert');
+    contactForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const payload = {
+        name: document.getElementById('cname').value,
+        email: document.getElementById('cemail').value,
+        message: document.getElementById('cmsg').value
+      };
+      const msgs = JSON.parse(localStorage.getItem('mtjMessages') || '[]');
+      msgs.push(payload);
+      localStorage.setItem('mtjMessages', JSON.stringify(msgs));
+      contactAlert.classList.remove('d-none');
+      contactForm.reset();
+      setTimeout(() => contactAlert.classList.add('d-none'), 5000);
+    });
+  </script>
 </body>
 </html>
